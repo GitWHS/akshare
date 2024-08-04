@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/2/21 11:00
+Date: 2023/3/3 20:03
 Desc: 同花顺-数据中心-资金流向
 同花顺-数据中心-资金流向-个股资金流
 https://data.10jqka.com.cn/funds/ggzjl/#refCountId=data_55f13c2c_254
@@ -12,13 +12,11 @@ https://data.10jqka.com.cn/funds/hyzjl/#refCountId=data_55f13c2c_254
 同花顺-数据中心-资金流向-打单追踪
 https://data.10jqka.com.cn/funds/ddzz/#refCountId=data_55f13c2c_254
 """
-from io import StringIO
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from py_mini_racer import py_mini_racer
-from akshare.utils.tqdm import get_tqdm
+from tqdm import tqdm
 
 from akshare.datasets import get_ths_js
 
@@ -63,7 +61,7 @@ def stock_fund_flow_individual(symbol: str = "即时") -> pd.DataFrame:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
-    url = "http://data.10jqka.com.cn/funds/ggzjl/field/code/order/desc/ajax/1/free/1/"
+    url = "http://data.10jqka.com.cn/funds/ggzjl/field/zdf/order/desc/ajax/1/free/1/"
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, "lxml")
     raw_page = soup.find("span", attrs={"class": "page_info"}).text
@@ -79,8 +77,7 @@ def stock_fund_flow_individual(symbol: str = "即时") -> pd.DataFrame:
     else:
         url = "http://data.10jqka.com.cn/funds/ggzjl/field/zdf/order/desc/page/{}/ajax/1/free/1/"
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
-    for page in tqdm(range(1, int(page_num) + 1), leave=False):
+    for page in tqdm(range(1, int(page_num) + 1)):
         js_code = py_mini_racer.MiniRacer()
         js_content = _get_file_content_ths("ths.js")
         js_code.eval(js_content)
@@ -99,7 +96,7 @@ def stock_fund_flow_individual(symbol: str = "即时") -> pd.DataFrame:
             "X-Requested-With": "XMLHttpRequest",
         }
         r = requests.get(url.format(page), headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     del big_df["序号"]
@@ -175,8 +172,7 @@ def stock_fund_flow_concept(symbol: str = "即时") -> pd.DataFrame:
     else:
         url = "http://data.10jqka.com.cn/funds/gnzjl/field/tradezdf/order/desc/page/{}/ajax/1/free/1/"
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
-    for page in tqdm(range(1, int(page_num) + 1), leave=False):
+    for page in tqdm(range(1, int(page_num) + 1)):
         js_code = py_mini_racer.MiniRacer()
         js_content = _get_file_content_ths("ths.js")
         js_code.eval(js_content)
@@ -195,7 +191,7 @@ def stock_fund_flow_concept(symbol: str = "即时") -> pd.DataFrame:
             "X-Requested-With": "XMLHttpRequest",
         }
         r = requests.get(url.format(page), headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     del big_df["序号"]
@@ -277,8 +273,7 @@ def stock_fund_flow_industry(symbol: str = "即时") -> pd.DataFrame:
     else:
         url = "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/{}/ajax/1/free/1/"
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
-    for page in tqdm(range(1, int(page_num) + 1), leave=False):
+    for page in tqdm(range(1, int(page_num) + 1)):
         js_code = py_mini_racer.MiniRacer()
         js_content = _get_file_content_ths("ths.js")
         js_code.eval(js_content)
@@ -297,7 +292,7 @@ def stock_fund_flow_industry(symbol: str = "即时") -> pd.DataFrame:
             "X-Requested-With": "XMLHttpRequest",
         }
         r = requests.get(url.format(page), headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     del big_df["序号"]
@@ -366,8 +361,7 @@ def stock_fund_flow_big_deal() -> pd.DataFrame:
     page_num = raw_page.split("/")[1]
     url = "http://data.10jqka.com.cn/funds/ddzz/order/asc/page/{}/ajax/1/free/1/"
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
-    for page in tqdm(range(1, int(page_num) + 1), leave=False):
+    for page in tqdm(range(1, int(page_num) + 1)):
         js_code = py_mini_racer.MiniRacer()
         js_content = _get_file_content_ths("ths.js")
         js_code.eval(js_content)
@@ -386,7 +380,7 @@ def stock_fund_flow_big_deal() -> pd.DataFrame:
             "X-Requested-With": "XMLHttpRequest",
         }
         r = requests.get(url.format(page), headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     big_df.columns = [

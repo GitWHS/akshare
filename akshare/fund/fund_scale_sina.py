@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 """
-Date: 2023/11/7 18:30
+Date: 2021/10/17 16:33
 Desc: 新浪财经-基金规模
-https://vip.stock.finance.sina.com.cn/fund_center/index.html#jjgmall
+http://vip.stock.finance.sina.com.cn/fund_center/index.html#jjgmall
 """
 import pandas as pd
 import requests
@@ -14,7 +14,7 @@ from akshare.utils import demjson
 def fund_scale_open_sina(symbol: str = "股票型基金") -> pd.DataFrame:
     """
     新浪财经-基金数据中心-基金规模-开放式基金
-    https://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
+    http://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
     :param symbol: choice of {"股票型基金", "混合型基金", "债券型基金", "货币型基金", "QDII基金"}
     :type symbol: str
     :return: 基金规模
@@ -39,7 +39,7 @@ def fund_scale_open_sina(symbol: str = "股票型基金") -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = demjson.decode(data_text[data_text.find("({") + 1: -2])
+    data_json = demjson.decode(data_text[data_text.find("({") + 1 : -2])
     temp_df = pd.DataFrame(data_json["data"])
     temp_df.reset_index(inplace=True)
     temp_df["index"] = range(1, len(temp_df) + 1)
@@ -80,8 +80,8 @@ def fund_scale_open_sina(symbol: str = "股票型基金") -> pd.DataFrame:
             "更新日期",
         ]
     ]
-    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"], errors="coerce").dt.date
-    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"], errors="coerce").dt.date
+    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"]).dt.date
+    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"]).dt.date
     temp_df["单位净值"] = pd.to_numeric(temp_df["单位净值"], errors="coerce")
     temp_df["总募集规模"] = pd.to_numeric(temp_df["总募集规模"], errors="coerce")
     temp_df["最近总份额"] = pd.to_numeric(temp_df["最近总份额"], errors="coerce")
@@ -91,7 +91,7 @@ def fund_scale_open_sina(symbol: str = "股票型基金") -> pd.DataFrame:
 def fund_scale_close_sina() -> pd.DataFrame:
     """
     新浪财经-基金数据中心-基金规模-封闭式基金
-    https://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
+    http://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
     :return: 基金规模
     :rtype: pandas.DataFrame
     """
@@ -107,7 +107,7 @@ def fund_scale_close_sina() -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = demjson.decode(data_text[data_text.find("({") + 1: -2])
+    data_json = demjson.decode(data_text[data_text.find("({") + 1 : -2])
     temp_df = pd.DataFrame(data_json["data"])
     temp_df.reset_index(inplace=True)
     temp_df["index"] = range(1, len(temp_df) + 1)
@@ -148,8 +148,8 @@ def fund_scale_close_sina() -> pd.DataFrame:
             "更新日期",
         ]
     ]
-    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"], errors="coerce").dt.date
-    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"], errors="coerce").dt.date
+    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"]).dt.date
+    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"]).dt.date
     temp_df["单位净值"] = pd.to_numeric(temp_df["单位净值"], errors="coerce")
     temp_df["总募集规模"] = pd.to_numeric(temp_df["总募集规模"], errors="coerce")
     temp_df["最近总份额"] = pd.to_numeric(temp_df["最近总份额"], errors="coerce")
@@ -159,7 +159,7 @@ def fund_scale_close_sina() -> pd.DataFrame:
 def fund_scale_structured_sina() -> pd.DataFrame:
     """
     新浪财经-基金数据中心-基金规模-分级子基金
-    https://vip.stock.finance.sina.com.cn/fund_center/index.html#jjgmfjall
+    http://vip.stock.finance.sina.com.cn/fund_center/index.html#jjhqetf
     :return: 基金规模
     :rtype: pandas.DataFrame
     """
@@ -175,7 +175,7 @@ def fund_scale_structured_sina() -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = demjson.decode(data_text[data_text.find("({") + 1: -2])
+    data_json = demjson.decode(data_text[data_text.find("({") + 1 : -2])
     temp_df = pd.DataFrame(data_json["data"])
     temp_df.reset_index(inplace=True)
     temp_df["index"] = range(1, len(temp_df) + 1)
@@ -216,8 +216,8 @@ def fund_scale_structured_sina() -> pd.DataFrame:
             "更新日期",
         ]
     ]
-    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"], errors="coerce").dt.date
-    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"], errors="coerce").dt.date
+    temp_df["成立日期"] = pd.to_datetime(temp_df["成立日期"]).dt.date
+    temp_df["更新日期"] = pd.to_datetime(temp_df["更新日期"]).dt.date
     temp_df["单位净值"] = pd.to_numeric(temp_df["单位净值"], errors="coerce")
     temp_df["总募集规模"] = pd.to_numeric(temp_df["总募集规模"], errors="coerce")
     temp_df["最近总份额"] = pd.to_numeric(temp_df["最近总份额"], errors="coerce")
@@ -225,8 +225,9 @@ def fund_scale_structured_sina() -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    fund_scale_open_sina_df = fund_scale_open_sina(symbol="股票型基金")
-    print(fund_scale_open_sina_df)
+    for fund_item in ["股票型基金", "混合型基金", "债券型基金", "货币型基金", "QDII基金"]:
+        fund_scale_open_sina_df = fund_scale_open_sina(symbol=fund_item)
+        print(fund_scale_open_sina_df)
 
     fund_scale_close_sina_df = fund_scale_close_sina()
     print(fund_scale_close_sina_df)

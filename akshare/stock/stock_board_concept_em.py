@@ -5,7 +5,6 @@ Date: 2023/6/29 17:13
 Desc: 东方财富-沪深板块-概念板块
 https://quote.eastmoney.com/center/boardlist.html#concept_board
 """
-
 import requests
 import pandas as pd
 
@@ -17,7 +16,7 @@ def stock_board_concept_name_em() -> pd.DataFrame:
     :return: 概念板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "https://79.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://79.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "2000",
@@ -88,9 +87,7 @@ def stock_board_concept_name_em() -> pd.DataFrame:
     temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
     temp_df["上涨家数"] = pd.to_numeric(temp_df["上涨家数"], errors="coerce")
     temp_df["下跌家数"] = pd.to_numeric(temp_df["下跌家数"], errors="coerce")
-    temp_df["领涨股票-涨跌幅"] = pd.to_numeric(
-        temp_df["领涨股票-涨跌幅"], errors="coerce"
-    )
+    temp_df["领涨股票-涨跌幅"] = pd.to_numeric(temp_df["领涨股票-涨跌幅"], errors="coerce")
     return temp_df
 
 
@@ -127,7 +124,7 @@ def stock_board_concept_hist_em(
         stock_board_concept_em_map["板块名称"] == symbol
     ]["板块代码"].values[0]
     adjust_map = {"": "0", "qfq": "1", "hfq": "2"}
-    url = "https://91.push2his.eastmoney.com/api/qt/stock/kline/get"
+    url = "http://91.push2his.eastmoney.com/api/qt/stock/kline/get"
     params = {
         "secid": f"90.{stock_board_code}",
         "ut": "fa5fd1943c7b386f172d6893dbfba10b",
@@ -185,8 +182,7 @@ def stock_board_concept_hist_em(
     return temp_df
 
 
-def stock_board_concept_hist_min_em(
-    symbol: str = "长寿药", period: str = "5"
+def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
 ) -> pd.DataFrame:
     """
     东方财富网-沪深板块-概念板块-分时历史行情
@@ -198,18 +194,15 @@ def stock_board_concept_hist_min_em(
     :return: 分时历史行情
     :rtype: pandas.DataFrame
     """
-    stock_board_concept_em_map = stock_board_concept_name_em()
-    stock_board_code = stock_board_concept_em_map[
-        stock_board_concept_em_map["板块名称"] == symbol
-    ]["板块代码"].values[0]
+
     if period == "1":
         url = "https://push2his.eastmoney.com/api/qt/stock/trends2/get"
         params = {
             "fields1": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13",
             "fields2": "f51,f52,f53,f54,f55,f56,f57,f58",
-            "ut": "fa5fd1943c7b386f172d6893dbfba10b",
-            "iscr": "0",
-            "ndays": "1",
+            "ut": 'fa5fd1943c7b386f172d6893dbfba10b',
+            "iscr": '0',
+            "ndays": '1',
             "secid": f"90.{stock_board_code}",
             "_": "1687852931312",
         }
@@ -235,9 +228,10 @@ def stock_board_concept_hist_min_em(
         temp_df["成交量"] = pd.to_numeric(temp_df["成交量"], errors="coerce")
         temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
         temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
+        temp_df["日期时间"] = pd.to_datetime(temp_df["日期时间"])
         return temp_df
     else:
-        url = "https://91.push2his.eastmoney.com/api/qt/stock/kline/get"
+        url = "http://91.push2his.eastmoney.com/api/qt/stock/kline/get"
         params = {
             "secid": f"90.{stock_board_code}",
             "ut": "fa5fd1943c7b386f172d6893dbfba10b",
@@ -251,9 +245,7 @@ def stock_board_concept_hist_min_em(
         }
         r = requests.get(url, params=params)
         data_json = r.json()
-        temp_df = pd.DataFrame(
-            [item.split(",") for item in data_json["data"]["klines"]]
-        )
+        temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
         temp_df.columns = [
             "日期时间",
             "开盘",
@@ -292,10 +284,11 @@ def stock_board_concept_hist_min_em(
         temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
         temp_df["振幅"] = pd.to_numeric(temp_df["振幅"], errors="coerce")
         temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
+        temp_df["日期时间"] = pd.to_datetime(temp_df["日期时间"])
         return temp_df
 
 
-def stock_board_concept_cons_em(symbol: str = "车联网") -> pd.DataFrame:
+def stock_board_concept_cons_em(stock_board_code: str = "车联网") -> pd.DataFrame:
     """
     东方财富-沪深板块-概念板块-板块成份
     https://quote.eastmoney.com/center/boardlist.html#boards-BK06551
@@ -304,14 +297,10 @@ def stock_board_concept_cons_em(symbol: str = "车联网") -> pd.DataFrame:
     :return: 板块成份
     :rtype: pandas.DataFrame
     """
-    stock_board_concept_em_map = stock_board_concept_name_em()
-    stock_board_code = stock_board_concept_em_map[
-        stock_board_concept_em_map["板块名称"] == symbol
-    ]["板块代码"].values[0]
-    url = "https://29.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://29.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "5000",
+        "pz": "2000",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -319,12 +308,12 @@ def stock_board_concept_cons_em(symbol: str = "车联网") -> pd.DataFrame:
         "invt": "2",
         "fid": "f3",
         "fs": f"b:{stock_board_code} f:!50",
-        "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,"
-        "f24,f25,f22,f11,f62,f128,f136,f115,f152,f45",
+        "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f45",
         "_": "1626081702127",
     }
     r = requests.get(url, params=params)
     data_json = r.json()
+
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     temp_df.reset_index(inplace=True)
     temp_df["index"] = range(1, len(temp_df) + 1)
@@ -400,22 +389,18 @@ def stock_board_concept_cons_em(symbol: str = "车联网") -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    stock_board_concept_em_df = stock_board_concept_name_em()
-    print(stock_board_concept_em_df)
+    # stock_board_concept_em_df = stock_board_concept_name_em()
+    # print(stock_board_concept_em_df)
+    #
+    # stock_board_concept_hist_em_df = stock_board_concept_hist_em(
+    #     symbol="绿色电力", period="daily", start_date="20220101", end_date="20230806", adjust=""
+    # )
+    # print(stock_board_concept_hist_em_df)
+    #
+    # stock_board_concept_hist_min_em_df = stock_board_concept_hist_min_em(
+    #     symbol="长寿药", period="5"
+    # )
+    # print(stock_board_concept_hist_min_em_df)
 
-    stock_board_concept_hist_em_df = stock_board_concept_hist_em(
-        symbol="绿色电力",
-        period="daily",
-        start_date="20220101",
-        end_date="20230806",
-        adjust="",
-    )
-    print(stock_board_concept_hist_em_df)
-
-    stock_board_concept_hist_min_em_df = stock_board_concept_hist_min_em(
-        symbol="长寿药", period="5"
-    )
-    print(stock_board_concept_hist_min_em_df)
-
-    stock_board_concept_cons_em_df = stock_board_concept_cons_em(symbol="融资融券")
+    stock_board_concept_cons_em_df = stock_board_concept_cons_em(symbol="网络安全")
     print(stock_board_concept_cons_em_df)

@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/1/20 23:30
+Date: 2022/5/25 20:32
 Desc: 世界各大城市生活成本数据
 https://expatistan.com/cost-of-living/index
 """
-from io import StringIO
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -34,12 +32,12 @@ def _get_region() -> dict:
     return name_url_dict
 
 
-def cost_living(symbol: str = "world") -> pd.DataFrame:
+def cost_living(region: str = "world") -> pd.DataFrame:
     """
     国家或地区生活成本数据
     https://expatistan.com/cost-of-living/index
-    :param symbol: choice of {"europe", "north-america", "latin-america", "asia", "middle-east", "africa", "oceania", "world"}
-    :type symbol: str
+    :param region: choice of {"europe", "north-america", "latin-america", "asia", "middle-east", "africa", "oceania", "world"}
+    :type region: str
     :return: 国家或地区生活成本数据
     :rtype: pandas.DataFrame
     """
@@ -53,13 +51,13 @@ def cost_living(symbol: str = "world") -> pd.DataFrame:
         "oceania": "/cost-of-living/index/oceania",
         "world": "/cost-of-living/index",
     }
-    url = f"https://www.expatistan.com{name_url_map[symbol]}"
+    url = f"https://www.expatistan.com{name_url_map[region]}"
     r = requests.get(url)
-    temp_df = pd.read_html(StringIO(r.text))[0]
+    temp_df = pd.read_html(r.text)[0]
     temp_df.columns = ["rank", "city", "index"]
     return temp_df
 
 
 if __name__ == "__main__":
-    cost_living_df = cost_living(symbol="world")
+    cost_living_df = cost_living()
     print(cost_living_df)

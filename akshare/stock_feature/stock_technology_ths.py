@@ -1,19 +1,17 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 """
-Date: 2024/2/7 23:00
+Date: 2021/11/2 21:08
 Desc: 同花顺-数据中心-技术选股
-https://data.10jqka.com.cn/rank/cxg/
+http://data.10jqka.com.cn/rank/cxg/
 """
-from io import StringIO
-
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from py_mini_racer import py_mini_racer
+from tqdm import tqdm
 
 from akshare.datasets import get_ths_js
-from akshare.utils.tqdm import get_tqdm
 
 
 def _get_file_content_ths(file: str = "ths.js") -> str:
@@ -33,7 +31,7 @@ def _get_file_content_ths(file: str = "ths.js") -> str:
 def stock_rank_cxg_ths(symbol: str = "创月新高") -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-创新高
-    https://data.10jqka.com.cn/rank/cxg/
+    http://data.10jqka.com.cn/rank/cxg/
     :param symbol: choice of {"创月新高", "半年新高", "一年新高", "历史新高"}
     :type symbol: str
     :return: 创新高数据
@@ -63,7 +61,6 @@ def stock_rank_cxg_ths(symbol: str = "创月新高") -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -72,7 +69,7 @@ def stock_rank_cxg_ths(symbol: str = "创月新高") -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/cxg/board/{symbol_map[symbol]}/field/stockcode/order/asc/page/{page}/ajax/1/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -87,18 +84,18 @@ def stock_rank_cxg_ths(symbol: str = "创月新高") -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].str.strip("%")
     big_df["换手率"] = big_df["换手率"].str.strip("%")
-    big_df["前期高点日期"] = pd.to_datetime(big_df["前期高点日期"], errors="coerce").dt.date
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["换手率"] = pd.to_numeric(big_df["换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["前期高点"] = pd.to_numeric(big_df["前期高点"], errors="coerce")
+    big_df["前期高点日期"] = pd.to_datetime(big_df["前期高点日期"]).dt.date
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["换手率"] = pd.to_numeric(big_df["换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["前期高点"] = pd.to_numeric(big_df["前期高点"])
     return big_df
 
 
 def stock_rank_cxd_ths(symbol: str = "创月新低") -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-创新低
-    https://data.10jqka.com.cn/rank/cxd/
+    http://data.10jqka.com.cn/rank/cxd/
     :param symbol: choice of {"创月新低", "半年新低", "一年新低", "历史新低"}
     :type symbol: str
     :return: 创新低数据
@@ -128,7 +125,6 @@ def stock_rank_cxd_ths(symbol: str = "创月新低") -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -137,7 +133,7 @@ def stock_rank_cxd_ths(symbol: str = "创月新低") -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/cxd/board/{symbol_map[symbol]}/field/stockcode/order/asc/page/{page}/ajax/1/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text))[0]
+        temp_df = pd.read_html(r.text)[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -152,18 +148,18 @@ def stock_rank_cxd_ths(symbol: str = "创月新低") -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].str.strip("%")
     big_df["换手率"] = big_df["换手率"].str.strip("%")
-    big_df["前期低点日期"] = pd.to_datetime(big_df["前期低点日期"], errors="coerce").dt.date
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["换手率"] = pd.to_numeric(big_df["换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["前期低点"] = pd.to_numeric(big_df["前期低点"], errors="coerce")
+    big_df["前期低点日期"] = pd.to_datetime(big_df["前期低点日期"]).dt.date
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["换手率"] = pd.to_numeric(big_df["换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["前期低点"] = pd.to_numeric(big_df["前期低点"])
     return big_df
 
 
 def stock_rank_lxsz_ths() -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-连续上涨
-    https://data.10jqka.com.cn/rank/lxsz/
+    http://data.10jqka.com.cn/rank/lxsz/
     :return: 连续上涨
     :rtype: pandas.DataFrame
     """
@@ -185,7 +181,6 @@ def stock_rank_lxsz_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -194,7 +189,7 @@ def stock_rank_lxsz_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/lxsz/field/lxts/order/desc/page/{page}/ajax/1/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -210,19 +205,19 @@ def stock_rank_lxsz_ths() -> pd.DataFrame:
     ]
     big_df["连续涨跌幅"] = big_df["连续涨跌幅"].str.strip("%")
     big_df["累计换手率"] = big_df["累计换手率"].str.strip("%")
-    big_df["连续涨跌幅"] = pd.to_numeric(big_df["连续涨跌幅"], errors="coerce")
-    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"], errors="coerce")
-    big_df["收盘价"] = pd.to_numeric(big_df["收盘价"], errors="coerce")
-    big_df["最高价"] = pd.to_numeric(big_df["最高价"], errors="coerce")
-    big_df["最低价"] = pd.to_numeric(big_df["最低价"], errors="coerce")
-    big_df["连涨天数"] = pd.to_numeric(big_df["连涨天数"], errors="coerce")
+    big_df["连续涨跌幅"] = pd.to_numeric(big_df["连续涨跌幅"])
+    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"])
+    big_df["收盘价"] = pd.to_numeric(big_df["收盘价"])
+    big_df["最高价"] = pd.to_numeric(big_df["最高价"])
+    big_df["最低价"] = pd.to_numeric(big_df["最低价"])
+    big_df["连涨天数"] = pd.to_numeric(big_df["连涨天数"])
     return big_df
 
 
 def stock_rank_lxxd_ths() -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-连续下跌
-    https://data.10jqka.com.cn/rank/lxxd/
+    http://data.10jqka.com.cn/rank/lxxd/
     :return: 连续下跌
     :rtype: pandas.DataFrame
     """
@@ -244,7 +239,6 @@ def stock_rank_lxxd_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -253,7 +247,7 @@ def stock_rank_lxxd_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/lxxd/field/lxts/order/desc/page/{page}/ajax/1/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -269,19 +263,19 @@ def stock_rank_lxxd_ths() -> pd.DataFrame:
     ]
     big_df["连续涨跌幅"] = big_df["连续涨跌幅"].str.strip("%")
     big_df["累计换手率"] = big_df["累计换手率"].str.strip("%")
-    big_df["连续涨跌幅"] = pd.to_numeric(big_df["连续涨跌幅"], errors="coerce")
-    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"], errors="coerce")
-    big_df["收盘价"] = pd.to_numeric(big_df["收盘价"], errors="coerce")
-    big_df["最高价"] = pd.to_numeric(big_df["最高价"], errors="coerce")
-    big_df["最低价"] = pd.to_numeric(big_df["最低价"], errors="coerce")
-    big_df["连涨天数"] = pd.to_numeric(big_df["连涨天数"], errors="coerce")
+    big_df["连续涨跌幅"] = pd.to_numeric(big_df["连续涨跌幅"])
+    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"])
+    big_df["收盘价"] = pd.to_numeric(big_df["收盘价"])
+    big_df["最高价"] = pd.to_numeric(big_df["最高价"])
+    big_df["最低价"] = pd.to_numeric(big_df["最低价"])
+    big_df["连涨天数"] = pd.to_numeric(big_df["连涨天数"])
     return big_df
 
 
 def stock_rank_cxfl_ths() -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-持续放量
-    https://data.10jqka.com.cn/rank/cxfl/
+    http://data.10jqka.com.cn/rank/cxfl/
     :return: 持续放量
     :rtype: pandas.DataFrame
     """
@@ -303,7 +297,6 @@ def stock_rank_cxfl_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -312,7 +305,7 @@ def stock_rank_cxfl_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/cxfl/field/count/order/desc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -329,17 +322,17 @@ def stock_rank_cxfl_ths() -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].astype(str).str.strip("%")
     big_df["阶段涨跌幅"] = big_df["阶段涨跌幅"].astype(str).str.strip("%")
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["阶段涨跌幅"] = pd.to_numeric(big_df["阶段涨跌幅"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["放量天数"] = pd.to_numeric(big_df["放量天数"], errors="coerce")
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["阶段涨跌幅"] = pd.to_numeric(big_df["阶段涨跌幅"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["放量天数"] = pd.to_numeric(big_df["放量天数"])
     return big_df
 
 
 def stock_rank_cxsl_ths() -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-持续缩量
-    https://data.10jqka.com.cn/rank/cxsl/
+    http://data.10jqka.com.cn/rank/cxsl/
     :return: 持续缩量
     :rtype: pandas.DataFrame
     """
@@ -361,7 +354,6 @@ def stock_rank_cxsl_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -370,7 +362,7 @@ def stock_rank_cxsl_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/cxsl/field/count/order/desc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -387,10 +379,10 @@ def stock_rank_cxsl_ths() -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].astype(str).str.strip("%")
     big_df["阶段涨跌幅"] = big_df["阶段涨跌幅"].astype(str).str.strip("%")
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["阶段涨跌幅"] = pd.to_numeric(big_df["阶段涨跌幅"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["缩量天数"] = pd.to_numeric(big_df["缩量天数"], errors="coerce")
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["阶段涨跌幅"] = pd.to_numeric(big_df["阶段涨跌幅"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["缩量天数"] = pd.to_numeric(big_df["缩量天数"])
     return big_df
 
 
@@ -431,7 +423,6 @@ def stock_rank_xstp_ths(symbol: str = "500日均线") -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -440,7 +431,7 @@ def stock_rank_xstp_ths(symbol: str = "500日均线") -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/xstp/board/{symbol_map[symbol]}/order/asc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -455,16 +446,16 @@ def stock_rank_xstp_ths(symbol: str = "500日均线") -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].astype(str).str.strip("%")
     big_df["换手率"] = big_df["换手率"].astype(str).str.strip("%")
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["换手率"] = pd.to_numeric(big_df["换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["换手率"] = pd.to_numeric(big_df["换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
     return big_df
 
 
 def stock_rank_xxtp_ths(symbol: str = "500日均线") -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-向下突破
-    https://data.10jqka.com.cn/rank/xxtp/
+    http://data.10jqka.com.cn/rank/xxtp/
     :param symbol: choice of {"5日均线", "10日均线", "20日均线", "30日均线", "60日均线", "90日均线", "250日均线", "500日均线"}
     :type symbol: str
     :return: 向下突破
@@ -498,7 +489,6 @@ def stock_rank_xxtp_ths(symbol: str = "500日均线") -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -507,7 +497,7 @@ def stock_rank_xxtp_ths(symbol: str = "500日均线") -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/xxtp/board/{symbol_map[symbol]}/order/asc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -522,9 +512,9 @@ def stock_rank_xxtp_ths(symbol: str = "500日均线") -> pd.DataFrame:
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
     big_df["涨跌幅"] = big_df["涨跌幅"].astype(str).str.strip("%")
     big_df["换手率"] = big_df["换手率"].astype(str).str.strip("%")
-    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["换手率"] = pd.to_numeric(big_df["换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
+    big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"])
+    big_df["换手率"] = pd.to_numeric(big_df["换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
     return big_df
 
 
@@ -553,7 +543,6 @@ def stock_rank_ljqs_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -562,7 +551,7 @@ def stock_rank_ljqs_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/ljqs/field/count/order/desc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -578,9 +567,9 @@ def stock_rank_ljqs_ths() -> pd.DataFrame:
     big_df["阶段涨幅"] = big_df["阶段涨幅"].astype(str).str.strip("%")
     big_df["累计换手率"] = big_df["累计换手率"].astype(str).str.strip("%")
     big_df["阶段涨幅"] = pd.to_numeric(big_df["阶段涨幅"], errors="coerce")
-    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["量价齐升天数"] = pd.to_numeric(big_df["量价齐升天数"], errors="coerce")
+    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["量价齐升天数"] = pd.to_numeric(big_df["量价齐升天数"])
     return big_df
 
 
@@ -609,7 +598,6 @@ def stock_rank_ljqd_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -618,7 +606,7 @@ def stock_rank_ljqd_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/rank/ljqd/field/count/order/desc/ajax/1/free/1/page/{page}/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -634,16 +622,16 @@ def stock_rank_ljqd_ths() -> pd.DataFrame:
     big_df["阶段涨幅"] = big_df["阶段涨幅"].astype(str).str.strip("%")
     big_df["累计换手率"] = big_df["累计换手率"].astype(str).str.strip("%")
     big_df["阶段涨幅"] = pd.to_numeric(big_df["阶段涨幅"], errors="coerce")
-    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"], errors="coerce")
-    big_df["最新价"] = pd.to_numeric(big_df["最新价"], errors="coerce")
-    big_df["量价齐跌天数"] = pd.to_numeric(big_df["量价齐跌天数"], errors="coerce")
+    big_df["累计换手率"] = pd.to_numeric(big_df["累计换手率"])
+    big_df["最新价"] = pd.to_numeric(big_df["最新价"])
+    big_df["量价齐跌天数"] = pd.to_numeric(big_df["量价齐跌天数"])
     return big_df
 
 
 def stock_rank_xzjp_ths() -> pd.DataFrame:
     """
     同花顺-数据中心-技术选股-险资举牌
-    https://data.10jqka.com.cn/financial/xzjp/
+    http://data.10jqka.com.cn/financial/xzjp/
     :return: 险资举牌
     :rtype: pandas.DataFrame
     """
@@ -665,7 +653,6 @@ def stock_rank_xzjp_ths() -> pd.DataFrame:
     except AttributeError as e:
         total_page = 1
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(total_page) + 1), leave=False):
         v_code = js_code.call("v")
         headers = {
@@ -674,7 +661,7 @@ def stock_rank_xzjp_ths() -> pd.DataFrame:
         }
         url = f"http://data.10jqka.com.cn/ajax/xzjp/field/DECLAREDATE/order/desc/ajax/1/free/1/"
         r = requests.get(url, headers=headers)
-        temp_df = pd.read_html(StringIO(r.text), converters={"股票代码": str})[0]
+        temp_df = pd.read_html(r.text, converters={"股票代码": str})[0]
         big_df = pd.concat([big_df, temp_df], ignore_index=True)
     big_df.columns = [
         "序号",
@@ -695,12 +682,12 @@ def stock_rank_xzjp_ths() -> pd.DataFrame:
     big_df["增持数量占总股本比例"] = big_df["增持数量占总股本比例"].astype(str).str.strip("%")
     big_df["变动后持股比例"] = big_df["变动后持股比例"].astype(str).str.strip("%")
     big_df["涨跌幅"] = pd.to_numeric(big_df["涨跌幅"], errors="coerce")
-    big_df["增持数量占总股本比例"] = pd.to_numeric(big_df["增持数量占总股本比例"], errors="coerce")
-    big_df["变动后持股比例"] = pd.to_numeric(big_df["变动后持股比例"], errors="coerce")
-    big_df["举牌公告日"] = pd.to_datetime(big_df["举牌公告日"], errors="coerce").dt.date
+    big_df["增持数量占总股本比例"] = pd.to_numeric(big_df["增持数量占总股本比例"])
+    big_df["变动后持股比例"] = pd.to_numeric(big_df["变动后持股比例"])
+    big_df["举牌公告日"] = pd.to_datetime(big_df["举牌公告日"]).dt.date
     big_df["股票代码"] = big_df["股票代码"].astype(str).str.zfill(6)
-    big_df["现价"] = pd.to_numeric(big_df["现价"], errors="coerce")
-    big_df["交易均价"] = pd.to_numeric(big_df["交易均价"], errors="coerce")
+    big_df["现价"] = pd.to_numeric(big_df["现价"])
+    big_df["交易均价"] = pd.to_numeric(big_df["交易均价"])
     del big_df["历史数据"]
     return big_df
 

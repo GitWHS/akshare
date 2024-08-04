@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/3/26 17:30
+Date: 2023/6/4 22:09
 Desc: AKShare's PYPI info file
 """
-
-import ast
 import re
+import ast
 
 import setuptools
 
@@ -16,13 +15,13 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 def get_version_string() -> str:
     """
-    get the version of akshare
+    Get the akshare version number
     :return: version number
     :rtype: str, e.g. '0.6.24'
     """
     with open("akshare/__init__.py", "rb") as _f:
         version_line = re.search(
-            pattern=r"__version__\s+=\s+(.*)", string=_f.read().decode("utf-8")
+            r"__version__\s+=\s+(.*)", _f.read().decode("utf-8")
         ).group(1)
         return str(ast.literal_eval(version_line))
 
@@ -43,6 +42,7 @@ setuptools.setup(
         "lxml>=4.2.1",
         "pandas>=0.25",
         "requests>=2.22.0",
+        "pypinyin>=0.35.0",
         "html5lib>=1.0.1",
         "xlrd>=1.2.0",
         "urllib3>=1.25.8",
@@ -51,19 +51,8 @@ setuptools.setup(
         "jsonpath>=0.82",
         "tabulate>=0.8.6",
         "decorator>=4.4.2",
-        "py-mini-racer>=0.6.0",
-        "akracer>=0.0.11",
+        "py_mini_racer>=0.6.0",
     ],
-    extras_require={
-        # 这些是额外的依赖集合，可以通过 'pip install akshare[full]' 安装
-        "full": [
-            "akqmt",
-        ],
-        # 这些是额外的依赖集合，可以通过 'pip install akshare[qmt]' 安装
-        "qmt": [
-            "akqmt",
-        ],
-    },
     package_data={"": ["*.py", "*.json", "*.pk", "*.js", "*.zip"]},
     keywords=[
         "stock",

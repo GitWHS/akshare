@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Date: 2024/6/21 18:00
+Date: 2023/1/4 10:50
 Desc: 新浪财经-股票期权
 https://stock.finance.sina.com.cn/option/quotes.html
 期权-中金所-沪深 300 指数
@@ -10,18 +10,15 @@ https://stock.finance.sina.com.cn/futures/view/optionsCffexDP.php
 期权-上交所-500ETF
 https://stock.finance.sina.com.cn/option/quotes.html
 """
-
-import datetime
 import json
-from functools import lru_cache
+import datetime
 from typing import Dict, List, Tuple
 
-import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 from akshare.option.option_em import option_current_em
-from akshare.utils.func import set_df_columns
 
 
 # 期权-中金所-上证50指数
@@ -34,7 +31,7 @@ def option_cffex_sz50_list_sina() -> Dict[str, List[str]]:
     """
     url = "https://stock.finance.sina.com.cn/futures/view/optionsCffexDP.php/ho/cffex"
     r = requests.get(url)
-    soup = BeautifulSoup(r.text, features="lxml")
+    soup = BeautifulSoup(r.text, "lxml")
     symbol = soup.find(attrs={"id": "option_symbol"}).find_all("li")[0].text
     temp_attr = soup.find(attrs={"id": "option_suffix"}).find_all("li")
     contract = [item.text for item in temp_attr]
@@ -51,7 +48,7 @@ def option_cffex_hs300_list_sina() -> Dict[str, List[str]]:
     """
     url = "https://stock.finance.sina.com.cn/futures/view/optionsCffexDP.php"
     r = requests.get(url)
-    soup = BeautifulSoup(r.text, features="lxml")
+    soup = BeautifulSoup(r.text, "lxml")
     symbol = soup.find(attrs={"id": "option_symbol"}).find_all("li")[1].text
     temp_attr = soup.find(attrs={"id": "option_suffix"}).find_all("li")
     contract = [item.text for item in temp_attr]
@@ -67,7 +64,7 @@ def option_cffex_zz1000_list_sina() -> Dict[str, List[str]]:
     """
     url = "https://stock.finance.sina.com.cn/futures/view/optionsCffexDP.php/mo/cffex"
     r = requests.get(url)
-    soup = BeautifulSoup(r.text, features="lxml")
+    soup = BeautifulSoup(r.text, "lxml")
     symbol = soup.find(attrs={"id": "option_symbol"}).find_all("li")[2].text
     temp_attr = soup.find(attrs={"id": "option_suffix"}).find_all("li")
     contract = [item.text for item in temp_attr]
@@ -92,7 +89,9 @@ def option_cffex_sz50_spot_sina(symbol: str = "ho2303") -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = json.loads(data_text[data_text.find("{") : data_text.rfind("}") + 1])
+    data_json = json.loads(
+        data_text[data_text.find("{") : data_text.rfind("}") + 1]
+    )
     option_call_df = pd.DataFrame(
         data_json["result"]["data"]["up"],
         columns=[
@@ -120,29 +119,21 @@ def option_cffex_sz50_spot_sina(symbol: str = "ho2303") -> pd.DataFrame:
             "看跌合约-标识",
         ],
     )
-    data_df = pd.concat(objs=[option_call_df, option_put_df], axis=1)
+    data_df = pd.concat([option_call_df, option_put_df], axis=1)
     data_df["看涨合约-买量"] = pd.to_numeric(data_df["看涨合约-买量"], errors="coerce")
     data_df["看涨合约-买价"] = pd.to_numeric(data_df["看涨合约-买价"], errors="coerce")
-    data_df["看涨合约-最新价"] = pd.to_numeric(
-        data_df["看涨合约-最新价"], errors="coerce"
-    )
+    data_df["看涨合约-最新价"] = pd.to_numeric(data_df["看涨合约-最新价"], errors="coerce")
     data_df["看涨合约-卖价"] = pd.to_numeric(data_df["看涨合约-卖价"], errors="coerce")
     data_df["看涨合约-卖量"] = pd.to_numeric(data_df["看涨合约-卖量"], errors="coerce")
-    data_df["看涨合约-持仓量"] = pd.to_numeric(
-        data_df["看涨合约-持仓量"], errors="coerce"
-    )
+    data_df["看涨合约-持仓量"] = pd.to_numeric(data_df["看涨合约-持仓量"], errors="coerce")
     data_df["看涨合约-涨跌"] = pd.to_numeric(data_df["看涨合约-涨跌"], errors="coerce")
     data_df["行权价"] = pd.to_numeric(data_df["行权价"], errors="coerce")
     data_df["看跌合约-买量"] = pd.to_numeric(data_df["看跌合约-买量"], errors="coerce")
     data_df["看跌合约-买价"] = pd.to_numeric(data_df["看跌合约-买价"], errors="coerce")
-    data_df["看跌合约-最新价"] = pd.to_numeric(
-        data_df["看跌合约-最新价"], errors="coerce"
-    )
+    data_df["看跌合约-最新价"] = pd.to_numeric(data_df["看跌合约-最新价"], errors="coerce")
     data_df["看跌合约-卖价"] = pd.to_numeric(data_df["看跌合约-卖价"], errors="coerce")
     data_df["看跌合约-卖量"] = pd.to_numeric(data_df["看跌合约-卖量"], errors="coerce")
-    data_df["看跌合约-持仓量"] = pd.to_numeric(
-        data_df["看跌合约-持仓量"], errors="coerce"
-    )
+    data_df["看跌合约-持仓量"] = pd.to_numeric(data_df["看跌合约-持仓量"], errors="coerce")
     data_df["看跌合约-涨跌"] = pd.to_numeric(data_df["看跌合约-涨跌"], errors="coerce")
     return data_df
 
@@ -165,7 +156,9 @@ def option_cffex_hs300_spot_sina(symbol: str = "io2204") -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = json.loads(data_text[data_text.find("{") : data_text.rfind("}") + 1])
+    data_json = json.loads(
+        data_text[data_text.find("{") : data_text.rfind("}") + 1]
+    )
     option_call_df = pd.DataFrame(
         data_json["result"]["data"]["up"],
         columns=[
@@ -193,29 +186,21 @@ def option_cffex_hs300_spot_sina(symbol: str = "io2204") -> pd.DataFrame:
             "看跌合约-标识",
         ],
     )
-    data_df = pd.concat(objs=[option_call_df, option_put_df], axis=1)
+    data_df = pd.concat([option_call_df, option_put_df], axis=1)
     data_df["看涨合约-买量"] = pd.to_numeric(data_df["看涨合约-买量"], errors="coerce")
     data_df["看涨合约-买价"] = pd.to_numeric(data_df["看涨合约-买价"], errors="coerce")
-    data_df["看涨合约-最新价"] = pd.to_numeric(
-        data_df["看涨合约-最新价"], errors="coerce"
-    )
+    data_df["看涨合约-最新价"] = pd.to_numeric(data_df["看涨合约-最新价"], errors="coerce")
     data_df["看涨合约-卖价"] = pd.to_numeric(data_df["看涨合约-卖价"], errors="coerce")
     data_df["看涨合约-卖量"] = pd.to_numeric(data_df["看涨合约-卖量"], errors="coerce")
-    data_df["看涨合约-持仓量"] = pd.to_numeric(
-        data_df["看涨合约-持仓量"], errors="coerce"
-    )
+    data_df["看涨合约-持仓量"] = pd.to_numeric(data_df["看涨合约-持仓量"], errors="coerce")
     data_df["看涨合约-涨跌"] = pd.to_numeric(data_df["看涨合约-涨跌"], errors="coerce")
     data_df["行权价"] = pd.to_numeric(data_df["行权价"], errors="coerce")
     data_df["看跌合约-买量"] = pd.to_numeric(data_df["看跌合约-买量"], errors="coerce")
     data_df["看跌合约-买价"] = pd.to_numeric(data_df["看跌合约-买价"], errors="coerce")
-    data_df["看跌合约-最新价"] = pd.to_numeric(
-        data_df["看跌合约-最新价"], errors="coerce"
-    )
+    data_df["看跌合约-最新价"] = pd.to_numeric(data_df["看跌合约-最新价"], errors="coerce")
     data_df["看跌合约-卖价"] = pd.to_numeric(data_df["看跌合约-卖价"], errors="coerce")
     data_df["看跌合约-卖量"] = pd.to_numeric(data_df["看跌合约-卖量"], errors="coerce")
-    data_df["看跌合约-持仓量"] = pd.to_numeric(
-        data_df["看跌合约-持仓量"], errors="coerce"
-    )
+    data_df["看跌合约-持仓量"] = pd.to_numeric(data_df["看跌合约-持仓量"], errors="coerce")
     data_df["看跌合约-涨跌"] = pd.to_numeric(data_df["看跌合约-涨跌"], errors="coerce")
     return data_df
 
@@ -238,7 +223,9 @@ def option_cffex_zz1000_spot_sina(symbol: str = "mo2208") -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_text = r.text
-    data_json = json.loads(data_text[data_text.find("{") : data_text.rfind("}") + 1])
+    data_json = json.loads(
+        data_text[data_text.find("{") : data_text.rfind("}") + 1]
+    )
     option_call_df = pd.DataFrame(
         data_json["result"]["data"]["up"],
         columns=[
@@ -266,29 +253,21 @@ def option_cffex_zz1000_spot_sina(symbol: str = "mo2208") -> pd.DataFrame:
             "看跌合约-标识",
         ],
     )
-    data_df = pd.concat(objs=[option_call_df, option_put_df], axis=1)
+    data_df = pd.concat([option_call_df, option_put_df], axis=1)
     data_df["看涨合约-买量"] = pd.to_numeric(data_df["看涨合约-买量"], errors="coerce")
     data_df["看涨合约-买价"] = pd.to_numeric(data_df["看涨合约-买价"], errors="coerce")
-    data_df["看涨合约-最新价"] = pd.to_numeric(
-        data_df["看涨合约-最新价"], errors="coerce"
-    )
+    data_df["看涨合约-最新价"] = pd.to_numeric(data_df["看涨合约-最新价"], errors="coerce")
     data_df["看涨合约-卖价"] = pd.to_numeric(data_df["看涨合约-卖价"], errors="coerce")
     data_df["看涨合约-卖量"] = pd.to_numeric(data_df["看涨合约-卖量"], errors="coerce")
-    data_df["看涨合约-持仓量"] = pd.to_numeric(
-        data_df["看涨合约-持仓量"], errors="coerce"
-    )
+    data_df["看涨合约-持仓量"] = pd.to_numeric(data_df["看涨合约-持仓量"], errors="coerce")
     data_df["看涨合约-涨跌"] = pd.to_numeric(data_df["看涨合约-涨跌"], errors="coerce")
     data_df["行权价"] = pd.to_numeric(data_df["行权价"], errors="coerce")
     data_df["看跌合约-买量"] = pd.to_numeric(data_df["看跌合约-买量"], errors="coerce")
     data_df["看跌合约-买价"] = pd.to_numeric(data_df["看跌合约-买价"], errors="coerce")
-    data_df["看跌合约-最新价"] = pd.to_numeric(
-        data_df["看跌合约-最新价"], errors="coerce"
-    )
+    data_df["看跌合约-最新价"] = pd.to_numeric(data_df["看跌合约-最新价"], errors="coerce")
     data_df["看跌合约-卖价"] = pd.to_numeric(data_df["看跌合约-卖价"], errors="coerce")
     data_df["看跌合约-卖量"] = pd.to_numeric(data_df["看跌合约-卖量"], errors="coerce")
-    data_df["看跌合约-持仓量"] = pd.to_numeric(
-        data_df["看跌合约-持仓量"], errors="coerce"
-    )
+    data_df["看跌合约-持仓量"] = pd.to_numeric(data_df["看跌合约-持仓量"], errors="coerce")
     data_df["看跌合约-涨跌"] = pd.to_numeric(data_df["看跌合约-涨跌"], errors="coerce")
     return data_df
 
@@ -304,10 +283,7 @@ def option_cffex_sz50_daily_sina(symbol: str = "ho2303P2350") -> pd.DataFrame:
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
     day = datetime.datetime.now().day
-    url = (
-        f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}"
-        f"=/FutureOptionAllService.getOptionDayline"
-    )
+    url = f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}=/FutureOptionAllService.getOptionDayline"
     params = {"symbol": symbol}
     r = requests.get(url, params=params)
     data_text = r.text
@@ -325,12 +301,12 @@ def option_cffex_sz50_daily_sina(symbol: str = "ho2303P2350") -> pd.DataFrame:
             "volume",
         ]
     ]
-    data_df["date"] = pd.to_datetime(data_df["date"], errors="coerce").dt.date
-    data_df["open"] = pd.to_numeric(data_df["open"], errors="coerce")
-    data_df["high"] = pd.to_numeric(data_df["high"], errors="coerce")
-    data_df["low"] = pd.to_numeric(data_df["low"], errors="coerce")
-    data_df["close"] = pd.to_numeric(data_df["close"], errors="coerce")
-    data_df["volume"] = pd.to_numeric(data_df["volume"], errors="coerce")
+    data_df["date"] = pd.to_datetime(data_df["date"]).dt.date
+    data_df["open"] = pd.to_numeric(data_df["open"])
+    data_df["high"] = pd.to_numeric(data_df["high"])
+    data_df["low"] = pd.to_numeric(data_df["low"])
+    data_df["close"] = pd.to_numeric(data_df["close"])
+    data_df["volume"] = pd.to_numeric(data_df["volume"])
     return data_df
 
 
@@ -345,10 +321,7 @@ def option_cffex_hs300_daily_sina(symbol: str = "io2202P4350") -> pd.DataFrame:
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
     day = datetime.datetime.now().day
-    url = (
-        f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}"
-        f"=/FutureOptionAllService.getOptionDayline"
-    )
+    url = f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}=/FutureOptionAllService.getOptionDayline"
     params = {"symbol": symbol}
     r = requests.get(url, params=params)
     data_text = r.text
@@ -366,12 +339,12 @@ def option_cffex_hs300_daily_sina(symbol: str = "io2202P4350") -> pd.DataFrame:
             "volume",
         ]
     ]
-    data_df["date"] = pd.to_datetime(data_df["date"], errors="coerce").dt.date
-    data_df["open"] = pd.to_numeric(data_df["open"], errors="coerce")
-    data_df["high"] = pd.to_numeric(data_df["high"], errors="coerce")
-    data_df["low"] = pd.to_numeric(data_df["low"], errors="coerce")
-    data_df["close"] = pd.to_numeric(data_df["close"], errors="coerce")
-    data_df["volume"] = pd.to_numeric(data_df["volume"], errors="coerce")
+    data_df["date"] = pd.to_datetime(data_df["date"]).dt.date
+    data_df["open"] = pd.to_numeric(data_df["open"])
+    data_df["high"] = pd.to_numeric(data_df["high"])
+    data_df["low"] = pd.to_numeric(data_df["low"])
+    data_df["close"] = pd.to_numeric(data_df["close"])
+    data_df["volume"] = pd.to_numeric(data_df["volume"])
     return data_df
 
 
@@ -388,10 +361,7 @@ def option_cffex_zz1000_daily_sina(
     year = datetime.datetime.now().year
     month = datetime.datetime.now().month
     day = datetime.datetime.now().day
-    url = (
-        f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}"
-        f"=/FutureOptionAllService.getOptionDayline"
-    )
+    url = f"https://stock.finance.sina.com.cn/futures/api/jsonp.php/var%20_{symbol}{year}_{month}_{day}=/FutureOptionAllService.getOptionDayline"
     params = {"symbol": symbol}
     r = requests.get(url, params=params)
     data_text = r.text
@@ -409,17 +379,19 @@ def option_cffex_zz1000_daily_sina(
             "volume",
         ]
     ]
-    data_df["date"] = pd.to_datetime(data_df["date"], errors="coerce").dt.date
-    data_df["open"] = pd.to_numeric(data_df["open"], errors="coerce")
-    data_df["high"] = pd.to_numeric(data_df["high"], errors="coerce")
-    data_df["low"] = pd.to_numeric(data_df["low"], errors="coerce")
-    data_df["close"] = pd.to_numeric(data_df["close"], errors="coerce")
-    data_df["volume"] = pd.to_numeric(data_df["volume"], errors="coerce")
+    data_df["date"] = pd.to_datetime(data_df["date"]).dt.date
+    data_df["open"] = pd.to_numeric(data_df["open"])
+    data_df["high"] = pd.to_numeric(data_df["high"])
+    data_df["low"] = pd.to_numeric(data_df["low"])
+    data_df["close"] = pd.to_numeric(data_df["close"])
+    data_df["volume"] = pd.to_numeric(data_df["volume"])
     return data_df
 
 
 # 期权-上交所-50ETF
-def option_sse_list_sina(symbol: str = "50ETF", exchange: str = "null") -> List[str]:
+def option_sse_list_sina(
+    symbol: str = "50ETF", exchange: str = "null"
+) -> List[str]:
     """
     新浪财经-期权-上交所-50ETF-合约到期月份列表
     https://stock.finance.sina.com.cn/option/quotes.html
@@ -430,7 +402,7 @@ def option_sse_list_sina(symbol: str = "50ETF", exchange: str = "null") -> List[
     :return: 合约到期时间
     :rtype: list
     """
-    url = "https://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName"
+    url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName"
     params = {"exchange": f"{exchange}", "cate": f"{symbol}"}
     r = requests.get(url, params=params)
     data_json = r.json()
@@ -452,7 +424,7 @@ def option_sse_expire_day_sina(
     :return: (到期时间, 剩余时间)
     :rtype: tuple
     """
-    url = "https://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getRemainderDay"
+    url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getRemainderDay"
     params = {
         "exchange": f"{exchange}",
         "cate": f"{symbol}",
@@ -462,7 +434,7 @@ def option_sse_expire_day_sina(
     data_json = r.json()
     data = data_json["result"]["data"]
     if int(data["remainderDays"]) < 0:
-        url = "https://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getRemainderDay"
+        url = "http://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getRemainderDay"
         params = {
             "exchange": f"{exchange}",
             "cate": f"{'XD' + symbol}",
@@ -494,7 +466,7 @@ def option_sse_codes_sina(
     if symbol == "看涨期权":
         url = "".join(
             [
-                "https://hq.sinajs.cn/list=OP_UP_",
+                "http://hq.sinajs.cn/list=OP_UP_",
                 underlying,
                 str(trade_date)[-4:],
             ]
@@ -502,7 +474,7 @@ def option_sse_codes_sina(
     else:
         url = "".join(
             [
-                "https://hq.sinajs.cn/list=OP_DOWN_",
+                "http://hq.sinajs.cn/list=OP_DOWN_",
                 underlying,
                 str(trade_date)[-4:],
             ]
@@ -522,8 +494,7 @@ def option_sse_codes_sina(
         "Sec-Fetch-Dest": "script",
         "Sec-Fetch-Mode": "no-cors",
         "Sec-Fetch-Site": "cross-site",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, headers=headers)
     data_text = r.text
@@ -547,7 +518,7 @@ def option_sse_spot_price_sina(symbol: str = "10003720") -> pd.DataFrame:
     :return: 期权量价数据
     :rtype: pandas.DataFrame
     """
-    url = f"https://hq.sinajs.cn/list=CON_OP_{symbol}"
+    url = f"http://hq.sinajs.cn/list=CON_OP_{symbol}"
     headers = {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate, br",
@@ -563,12 +534,13 @@ def option_sse_spot_price_sina(symbol: str = "10003720") -> pd.DataFrame:
         "Sec-Fetch-Dest": "script",
         "Sec-Fetch-Mode": "no-cors",
         "Sec-Fetch-Site": "cross-site",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, headers=headers)
     data_text = r.text
-    data_list = data_text[data_text.find('"') + 1 : data_text.rfind('"')].split(",")
+    data_list = data_text[
+        data_text.find('"') + 1 : data_text.rfind('"')
+    ].split(",")
     field_list = [
         "买量",
         "买价",
@@ -614,7 +586,9 @@ def option_sse_spot_price_sina(symbol: str = "10003720") -> pd.DataFrame:
         "成交量",
         "成交额",
     ]
-    data_df = pd.DataFrame(list(zip(field_list, data_list)), columns=["字段", "值"])
+    data_df = pd.DataFrame(
+        list(zip(field_list, data_list)), columns=["字段", "值"]
+    )
     return data_df
 
 
@@ -628,7 +602,7 @@ def option_sse_underlying_spot_price_sina(
     :return: 期权标的物的信息
     :rtype: pandas.DataFrame
     """
-    url = f"https://hq.sinajs.cn/list={symbol}"
+    url = f"http://hq.sinajs.cn/list={symbol}"
     headers = {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate",
@@ -637,13 +611,14 @@ def option_sse_underlying_spot_price_sina(
         "Host": "hq.sinajs.cn",
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
-        "Referer": "https://vip.stock.finance.sina.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "Referer": "http://vip.stock.finance.sina.com.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, headers=headers)
     data_text = r.text
-    data_list = data_text[data_text.find('"') + 1 : data_text.rfind('"')].split(",")
+    data_list = data_text[
+        data_text.find('"') + 1 : data_text.rfind('"')
+    ].split(",")
     field_list = [
         "证券简称",
         "今日开盘价",
@@ -679,7 +654,9 @@ def option_sse_underlying_spot_price_sina(
         "行情时间",
         "停牌状态",
     ]
-    data_df = pd.DataFrame(list(zip(field_list, data_list)), columns=["字段", "值"])
+    data_df = pd.DataFrame(
+        list(zip(field_list, data_list)), columns=["字段", "值"]
+    )
     return data_df
 
 
@@ -691,7 +668,7 @@ def option_sse_greeks_sina(symbol: str = "10003045") -> pd.DataFrame:
     :return: 期权基本信息表
     :rtype: pandas.DataFrame
     """
-    url = f"https://hq.sinajs.cn/list=CON_SO_{symbol}"
+    url = f"http://hq.sinajs.cn/list=CON_SO_{symbol}"
     headers = {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate",
@@ -700,13 +677,14 @@ def option_sse_greeks_sina(symbol: str = "10003045") -> pd.DataFrame:
         "Host": "hq.sinajs.cn",
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
-        "Referer": "https://vip.stock.finance.sina.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "Referer": "http://vip.stock.finance.sina.com.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, headers=headers)
     data_text = r.text
-    data_list = data_text[data_text.find('"') + 1 : data_text.rfind('"')].split(",")
+    data_list = data_text[
+        data_text.find('"') + 1 : data_text.rfind('"')
+    ].split(",")
     field_list = [
         "期权合约简称",
         "成交量",
@@ -753,23 +731,20 @@ def option_sse_minute_sina(symbol: str = "10003720") -> pd.DataFrame:
         "sec-fetch-dest": "script",
         "sec-fetch-mode": "no-cors",
         "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, params=params, headers=headers)
     data_json = r.json()
     temp_df = data_json["result"]["data"]
     data_df = pd.DataFrame(temp_df)
-    data_df = set_df_columns(
-        df=data_df, cols=["时间", "价格", "成交", "持仓", "均价", "日期"]
-    )
+    data_df.columns = ["时间", "价格", "成交", "持仓", "均价", "日期"]
     data_df = data_df[["日期", "时间", "价格", "成交", "持仓", "均价"]]
-    data_df["日期"] = pd.to_datetime(data_df["日期"], errors="coerce").dt.date
-    data_df["日期"] = data_df["日期"].ffill()
-    data_df["价格"] = pd.to_numeric(data_df["价格"], errors="coerce")
-    data_df["成交"] = pd.to_numeric(data_df["成交"], errors="coerce")
-    data_df["持仓"] = pd.to_numeric(data_df["持仓"], errors="coerce")
-    data_df["均价"] = pd.to_numeric(data_df["均价"], errors="coerce")
+    data_df["日期"] = pd.to_datetime(data_df["日期"]).dt.date
+    data_df["日期"].ffill(inplace=True)
+    data_df["价格"] = pd.to_numeric(data_df["价格"])
+    data_df["成交"] = pd.to_numeric(data_df["成交"])
+    data_df["持仓"] = pd.to_numeric(data_df["持仓"])
+    data_df["均价"] = pd.to_numeric(data_df["均价"])
     return data_df
 
 
@@ -781,7 +756,7 @@ def option_sse_daily_sina(symbol: str = "10003889") -> pd.DataFrame:
     :return: 指定期权的所有日频率历史数据
     :rtype: pandas.DataFrame
     """
-    url = "https://stock.finance.sina.com.cn/futures/api/jsonp_v2.php//StockOptionDaylineService.getSymbolInfo"
+    url = "http://stock.finance.sina.com.cn/futures/api/jsonp_v2.php//StockOptionDaylineService.getSymbolInfo"
     params = {"symbol": f"CON_OP_{symbol}"}
     headers = {
         "accept": "*/*",
@@ -796,20 +771,21 @@ def option_sse_daily_sina(symbol: str = "10003889") -> pd.DataFrame:
         "sec-fetch-dest": "script",
         "sec-fetch-mode": "no-cors",
         "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, params=params, headers=headers)
     data_text = r.text
-    data_json = json.loads(data_text[data_text.find("(") + 1 : data_text.rfind(")")])
+    data_json = json.loads(
+        data_text[data_text.find("(") + 1 : data_text.rfind(")")]
+    )
     temp_df = pd.DataFrame(data_json)
     temp_df.columns = ["日期", "开盘", "最高", "最低", "收盘", "成交量"]
-    temp_df["日期"] = pd.to_datetime(temp_df["日期"], errors="coerce").dt.date
-    temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
-    temp_df["最高"] = pd.to_numeric(temp_df["最高"], errors="coerce")
-    temp_df["最低"] = pd.to_numeric(temp_df["最低"], errors="coerce")
-    temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
-    temp_df["成交量"] = pd.to_numeric(temp_df["成交量"], errors="coerce")
+    temp_df["日期"] = pd.to_datetime(temp_df["日期"]).dt.date
+    temp_df["开盘"] = pd.to_numeric(temp_df["开盘"])
+    temp_df["最高"] = pd.to_numeric(temp_df["最高"])
+    temp_df["最低"] = pd.to_numeric(temp_df["最低"])
+    temp_df["收盘"] = pd.to_numeric(temp_df["收盘"])
+    temp_df["成交量"] = pd.to_numeric(temp_df["成交量"])
     return temp_df
 
 
@@ -839,47 +815,34 @@ def option_finance_minute_sina(symbol: str = "10002530") -> pd.DataFrame:
         "sec-fetch-dest": "script",
         "sec-fetch-mode": "no-cors",
         "sec-fetch-site": "same-origin",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/97.0.4692.71 Safari/537.36",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
     }
     r = requests.get(url, params=params, headers=headers)
     data_text = r.json()
     temp_df = pd.DataFrame()
     for item in data_text["result"]["data"]:
-        temp_df = pd.concat(objs=[temp_df, pd.DataFrame(item)], ignore_index=True)
-    temp_df.ffill(inplace=True)
+        temp_df = pd.concat([temp_df, pd.DataFrame(item)], ignore_index=True)
+    temp_df.fillna(method="ffill", inplace=True)
     temp_df.columns = ["time", "price", "volume", "_", "average_price", "date"]
     temp_df = temp_df[["date", "time", "price", "average_price", "volume"]]
-    temp_df["price"] = pd.to_numeric(temp_df["price"], errors="coerce")
-    temp_df["average_price"] = pd.to_numeric(temp_df["average_price"], errors="coerce")
-    temp_df["volume"] = pd.to_numeric(temp_df["volume"], errors="coerce")
+    temp_df["price"] = pd.to_numeric(temp_df["price"])
+    temp_df["average_price"] = pd.to_numeric(temp_df["average_price"])
+    temp_df["volume"] = pd.to_numeric(temp_df["volume"])
     return temp_df
 
 
-@lru_cache()
-def __option_current_em() -> pd.DataFrame:
-    inner_option_current_em_df = option_current_em()
-    return inner_option_current_em_df
-
-
-def option_minute_em(symbol: str = "MO2404-P-4450") -> pd.DataFrame:
+def option_minute_em(symbol: str = "10005265") -> pd.DataFrame:
     """
     东方财富网-行情中心-期权市场-分时行情
-    https://wap.eastmoney.com/quote/stock/151.cu2404P61000.html
+    https://stock.finance.sina.com.cn/option/quotes.html
     :param symbol: 期权代码; 通过调用 ak.option_current_em() 获取
     :type symbol: str
     :return: 指定期权的分钟频率数据
     :rtype: pandas.DataFrame
     """
-    inner_option_current_em_df = __option_current_em()
-    inner_option_current_em_df["标识"] = (
-        inner_option_current_em_df["市场标识"].astype(str)
-        + "."
-        + inner_option_current_em_df["代码"]
-    )
-    id_ = inner_option_current_em_df[inner_option_current_em_df["代码"] == symbol][
-        "标识"
-    ].values[0]
+    option_current_em_df = option_current_em()
+    option_current_em_df['标识'] = option_current_em_df['市场标识'].astype(str) + '.' + option_current_em_df['代码']
+    id_ = option_current_em_df[option_current_em_df['代码'] == symbol]['标识'].values[0]
     url = "https://push2.eastmoney.com/api/qt/stock/trends2/get"
     params = {
         "secid": id_,
@@ -894,7 +857,7 @@ def option_minute_em(symbol: str = "MO2404-P-4450") -> pd.DataFrame:
     r = requests.get(url, params=params)
     data_text = r.text
     data_json = json.loads(data_text[data_text.find("(") + 1 : data_text.rfind(")")])
-    temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["trends"]])
+    temp_df = pd.DataFrame([item.split(",") for item in data_json['data']['trends']])
     temp_df.columns = ["time", "close", "high", "low", "volume", "amount", "-"]
     temp_df = temp_df[["time", "close", "high", "low", "volume", "amount"]]
     temp_df["close"] = pd.to_numeric(temp_df["close"], errors="coerce")
@@ -916,16 +879,24 @@ if __name__ == "__main__":
     option_cffex_zz1000_list_sina_df = option_cffex_zz1000_list_sina()
     print(option_cffex_zz1000_list_sina_df)
 
-    option_cffex_sz50_spot_sina_df = option_cffex_sz50_spot_sina(symbol="ho2303")
+    option_cffex_sz50_spot_sina_df = option_cffex_sz50_spot_sina(
+        symbol="ho2303"
+    )
     print(option_cffex_sz50_spot_sina_df)
 
-    option_cffex_hs300_spot_sina_df = option_cffex_hs300_spot_sina(symbol="io2209")
+    option_cffex_hs300_spot_sina_df = option_cffex_hs300_spot_sina(
+        symbol="io2209"
+    )
     print(option_cffex_hs300_spot_sina_df)
 
-    option_cffex_zz1000_spot_sina_df = option_cffex_zz1000_spot_sina(symbol="mo2209")
+    option_cffex_zz1000_spot_sina_df = option_cffex_zz1000_spot_sina(
+        symbol="mo2209"
+    )
     print(option_cffex_zz1000_spot_sina_df)
 
-    option_cffex_sz50_daily_sina_df = option_cffex_sz50_daily_sina(symbol="ho2303P2350")
+    option_cffex_sz50_daily_sina_df = option_cffex_sz50_daily_sina(
+        symbol="ho2303P2350"
+    )
     print(option_cffex_sz50_daily_sina_df)
 
     option_cffex_hs300_daily_sina_df = option_cffex_hs300_daily_sina(
@@ -939,7 +910,9 @@ if __name__ == "__main__":
     print(option_cffex_zz1000_daily_sina_df)
 
     # 期权-上交所-50ETF
-    option_sse_list_sina_df = option_sse_list_sina(symbol="50ETF", exchange="null")
+    option_sse_list_sina_df = option_sse_list_sina(
+        symbol="50ETF", exchange="null"
+    )
     print(option_sse_list_sina_df)
 
     option_sse_expire_day_sina_df = option_sse_expire_day_sina(
@@ -952,11 +925,13 @@ if __name__ == "__main__":
     )
     print(option_sse_codes_sina_df)
 
-    option_sse_spot_price_sina_df = option_sse_spot_price_sina(symbol="10003686")
+    option_sse_spot_price_sina_df = option_sse_spot_price_sina(
+        symbol="10003686"
+    )
     print(option_sse_spot_price_sina_df)
 
-    option_sse_underlying_spot_price_sina_df = option_sse_underlying_spot_price_sina(
-        symbol="sh510300"
+    option_sse_underlying_spot_price_sina_df = (
+        option_sse_underlying_spot_price_sina(symbol="sh510300")
     )
     print(option_sse_underlying_spot_price_sina_df)
 
@@ -969,11 +944,13 @@ if __name__ == "__main__":
     option_sse_daily_sina_df = option_sse_daily_sina(symbol="10004023")
     print(option_sse_daily_sina_df)
 
-    option_finance_minute_sina_df = option_finance_minute_sina(symbol="10004023")
+    option_finance_minute_sina_df = option_finance_minute_sina(
+        symbol="10004023"
+    )
     print(option_finance_minute_sina_df)
 
     option_current_em_df = option_current_em()
     print(option_current_em_df)
 
-    option_minute_em_df = option_minute_em(symbol="IO2406-C-3500")
+    option_minute_em_df = option_minute_em(symbol="10005265")
     print(option_minute_em_df)

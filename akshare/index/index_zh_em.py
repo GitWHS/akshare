@@ -4,7 +4,6 @@
 Date: 2023/12/11 20:20
 Desc: 东方财富网-指数行情数据
 """
-
 from functools import lru_cache
 
 import pandas as pd
@@ -89,10 +88,10 @@ def index_code_id_map_em() -> dict:
 
 
 def index_zh_a_hist(
-    symbol: str = "000859",
-    period: str = "daily",
-    start_date: str = "19700101",
-    end_date: str = "22220101",
+        symbol: str = "000859",
+        period: str = "daily",
+        start_date: str = "19700101",
+        end_date: str = "22220101",
 ) -> pd.DataFrame:
     """
     东方财富网-中国股票指数-行情数据
@@ -183,7 +182,7 @@ def index_zh_a_hist(
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
         )
-    except:  # noqa: E722
+    except:
         # 兼容 000859(中证国企一路一带) 和 000861(中证央企创新)
         params = {
             "secid": f"2.{symbol}",
@@ -231,10 +230,10 @@ def index_zh_a_hist(
 
 
 def index_zh_a_hist_min_em(
-    symbol: str = "399006",
-    period: str = "1",
-    start_date: str = "1979-09-01 09:32:00",
-    end_date: str = "2222-01-01 09:32:00",
+        symbol: str = "399006",
+        period: str = "1",
+        start_date: str = "1979-09-01 09:32:00",
+        end_date: str = "2222-01-01 09:32:00",
 ) -> pd.DataFrame:
     """
     东方财富网-指数数据-每日分时行情
@@ -338,7 +337,7 @@ def index_zh_a_hist_min_em(
                 "end": "20500000",
                 "_": "1630930917857",
             }
-        except:  # noqa: E722
+        except:
             params = {
                 "secid": f"0.{symbol}",
                 "ut": "7eea3edcaed734bea9cbfc24409ed989",
@@ -429,6 +428,8 @@ def index_zh_a_hist_min_em(
 
 
 if __name__ == "__main__":
+    res = index_code_id_map_em()
+    print(res)
     index_zh_a_hist_df = index_zh_a_hist(
         symbol="800000",
         period="daily",
@@ -440,7 +441,7 @@ if __name__ == "__main__":
     index_zh_a_hist_min_em_df = index_zh_a_hist_min_em(
         symbol="000001",
         period="1",
-        start_date="2024-03-20 09:30:00",
-        end_date="2024-03-20 19:00:00",
+        start_date="2023-12-11 09:30:00",
+        end_date="2023-12-11 19:00:00",
     )
     print(index_zh_a_hist_min_em_df)

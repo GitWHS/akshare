@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/5/6 17:30
+Date: 2023/9/18 17:20
 Desc: 同花顺-板块-行业板块
 https://q.10jqka.com.cn/thshy/
 """
-
 from datetime import datetime
 from io import StringIO
 
@@ -13,7 +12,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from py_mini_racer import py_mini_racer
-from akshare.utils.tqdm import get_tqdm
+from tqdm import tqdm
 
 from akshare.datasets import get_ths_js
 from akshare.utils import demjson
@@ -360,6 +359,61 @@ def stock_board_industry_name_ths() -> pd.DataFrame:
     return temp_df
 
 
+def stock_board_industry_cons_ths(symbol: str = "半导体及元件") -> pd.DataFrame:
+    """
+    同花顺-板块-行业板块-成份股
+    https://q.10jqka.com.cn/thshy/detail/code/881121/
+    :param symbol: 板块名称
+    :type symbol: str
+    :return: 成份股
+    :rtype: pandas.DataFrame
+    """
+    stock_board_ths_map_df = stock_board_industry_name_ths()
+    symbol = stock_board_ths_map_df[stock_board_ths_map_df["name"] == symbol][
+        "code"
+    ].values[0]
+    js_code = py_mini_racer.MiniRacer()
+    js_content = _get_file_content_ths("ths.js")
+    js_code.eval(js_content)
+    v_code = js_code.call("v")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+        "Cookie": f"v={v_code}",
+    }
+    url = f"http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/1/ajax/1/code/{symbol}"
+    r = requests.get(url, headers=headers)
+    soup = BeautifulSoup(r.text, "lxml")
+    try:
+        page_num = int(soup.find_all("a", attrs={"class": "changePage"})[-1]["page"])
+    except IndexError as e:
+        page_num = 1
+    big_df = pd.DataFrame()
+    for page in tqdm(range(1, page_num + 1), leave=False):
+        v_code = js_code.call("v")
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
+            "Cookie": f"v={v_code}",
+        }
+        url = f"http://q.10jqka.com.cn/thshy/detail/field/199112/order/desc/page/{page}/ajax/1/code/{symbol}"
+        r = requests.get(url, headers=headers)
+        temp_df = pd.read_html(StringIO(r.text))[0]
+        big_df = pd.concat([big_df, temp_df], ignore_index=True)
+
+    big_df.rename(
+        {
+            "涨跌幅(%)": "涨跌幅",
+            "涨速(%)": "涨速",
+            "换手(%)": "换手",
+            "振幅(%)": "振幅",
+        },
+        inplace=True,
+        axis=1,
+    )
+    del big_df["加自选"]
+    big_df["代码"] = big_df["代码"].astype(str).str.zfill(6)
+    return big_df
+
+
 def stock_board_industry_info_ths(symbol: str = "半导体及元件") -> pd.DataFrame:
     """
     同花顺-板块-行业板块-板块简介
@@ -375,18 +429,17 @@ def stock_board_industry_info_ths(symbol: str = "半导体及元件") -> pd.Data
     ].values[0]
     url = f"http://q.10jqka.com.cn/thshy/detail/code/{symbol_code}/"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/89.0.4389.90 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
     }
     r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, features="lxml")
+    soup = BeautifulSoup(r.text, "lxml")
     name_list = [
         item.text.strip()
-        for item in soup.find(name="div", attrs={"class": "board-infos"}).find_all("dt")
+        for item in soup.find("div", attrs={"class": "board-infos"}).find_all("dt")
     ]
     value_list = [
         item.text.strip().replace("\n", "/")
-        for item in soup.find(name="div", attrs={"class": "board-infos"}).find_all("dd")
+        for item in soup.find("div", attrs={"class": "board-infos"}).find_all("dd")
     ]
     temp_df = pd.DataFrame([name_list, value_list]).T
     temp_df.columns = ["项目", "值"]
@@ -396,11 +449,11 @@ def stock_board_industry_info_ths(symbol: str = "半导体及元件") -> pd.Data
 def stock_board_industry_index_ths(
     symbol: str = "半导体及元件",
     start_date: str = "20200101",
-    end_date: str = "20240108",
+    end_date: str = "20211027",
 ) -> pd.DataFrame:
     """
     同花顺-板块-行业板块-指数数据
-    https://q.10jqka.com.cn/gn/detail/code/301558/
+    http://q.10jqka.com.cn/gn/detail/code/301558/
     :param start_date: 开始时间
     :type start_date: str
     :param end_date: 结束时间
@@ -415,13 +468,10 @@ def stock_board_industry_index_ths(
     symbol_code = code_map[symbol]
     big_df = pd.DataFrame()
     current_year = datetime.now().year
-    begin_year = int(start_date[:4])
-    tqdm = get_tqdm()
-    for year in tqdm(range(begin_year, current_year + 1), leave=False):
-        url = f"https://d.10jqka.com.cn/v4/line/bk_{symbol_code}/01/{year}.js"
+    for year in tqdm(range(2000, current_year + 1), leave=False):
+        url = f"http://d.10jqka.com.cn/v4/line/bk_{symbol_code}/01/{year}.js"
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/89.0.4389.90 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
             "Referer": "http://q.10jqka.com.cn",
             "Host": "d.10jqka.com.cn",
         }
@@ -429,12 +479,12 @@ def stock_board_industry_index_ths(
         data_text = r.text
         try:
             demjson.decode(data_text[data_text.find("{") : -1])
-        except:  # noqa: E722
+        except:
             continue
         temp_df = demjson.decode(data_text[data_text.find("{") : -1])
         temp_df = pd.DataFrame(temp_df["data"].split(";"))
         temp_df = temp_df.iloc[:, 0].str.split(",", expand=True)
-        big_df = pd.concat(objs=[big_df, temp_df], ignore_index=True)
+        big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     if len(big_df.columns) == 11:
         big_df.columns = [
@@ -476,8 +526,8 @@ def stock_board_industry_index_ths(
             "成交额",
         ]
     ]
-    big_df["日期"] = pd.to_datetime(big_df["日期"], errors="coerce").dt.date
-    big_df.index = pd.to_datetime(big_df["日期"], errors="coerce")
+    big_df["日期"] = pd.to_datetime(big_df["日期"]).dt.date
+    big_df.index = pd.to_datetime(big_df["日期"])
     big_df = big_df[start_date:end_date]
     big_df.reset_index(drop=True, inplace=True)
     big_df["开盘价"] = pd.to_numeric(big_df["开盘价"], errors="coerce")
@@ -501,29 +551,26 @@ def stock_ipo_benefit_ths() -> pd.DataFrame:
     js_code.eval(js_content)
     v_code = js_code.call("v")
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/89.0.4389.90 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
         "Cookie": f"v={v_code}",
         "hexin-v": v_code,
     }
-    url = "https://data.10jqka.com.cn/ipo/syg/field/invest/order/desc/page/1/ajax/1/free/1/"
+    url = f"http://data.10jqka.com.cn/ipo/syg/field/invest/order/desc/page/1/ajax/1/free/1/"
     r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, features="lxml")
-    page_num = soup.find(name="span", attrs={"class": "page_info"}).text.split("/")[1]
+    soup = BeautifulSoup(r.text, "lxml")
+    page_num = soup.find("span", attrs={"class": "page_info"}).text.split("/")[1]
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(page_num) + 1), leave=False):
-        url = f"https://data.10jqka.com.cn/ipo/syg/field/invest/order/desc/page/{page}/ajax/1/free/1/"
+        url = f"http://data.10jqka.com.cn/ipo/syg/field/invest/order/desc/page/{page}/ajax/1/free/1/"
         v_code = js_code.call("v")
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/89.0.4389.90 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
             "Cookie": f"v={v_code}",
             "hexin-v": v_code,
         }
         r = requests.get(url, headers=headers)
         temp_df = pd.read_html(StringIO(r.text))[0]
-        big_df = pd.concat(objs=[big_df, temp_df], ignore_index=True)
+        big_df = pd.concat([big_df, temp_df], ignore_index=True)
 
     big_df.columns = [
         "序号",
@@ -558,16 +605,14 @@ def stock_board_industry_summary_ths() -> pd.DataFrame:
     js_code.eval(js_content)
     v_code = js_code.call("v")
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/89.0.4389.90 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36",
         "Cookie": f"v={v_code}",
     }
-    url = "http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/1/ajax/1/"
+    url = f"http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/1/ajax/1/"
     r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, features="lxml")
-    page_num = soup.find(name="span", attrs={"class": "page_info"}).text.split("/")[1]
+    soup = BeautifulSoup(r.text, "lxml")
+    page_num = soup.find("span", attrs={"class": "page_info"}).text.split("/")[1]
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, int(page_num) + 1), leave=False):
         url = f"http://q.10jqka.com.cn/thshy/index/field/199112/order/desc/page/{page}/ajax/1/"
         r = requests.get(url, headers=headers)
@@ -604,11 +649,14 @@ if __name__ == "__main__":
     stock_board_industry_name_ths_df = stock_board_industry_name_ths()
     print(stock_board_industry_name_ths_df)
 
+    stock_board_industry_cons_ths_df = stock_board_industry_cons_ths(symbol="涂料油墨")
+    print(stock_board_industry_cons_ths_df)
+
     stock_board_industry_info_ths_df = stock_board_industry_info_ths(symbol="小家电")
     print(stock_board_industry_info_ths_df)
 
     stock_board_industry_index_ths_df = stock_board_industry_index_ths(
-        symbol="通信服务", start_date="20230825", end_date="20240221"
+        symbol="养殖业", start_date="20150101", end_date="20211027"
     )
     print(stock_board_industry_index_ths_df)
 

@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/3/17 18:20
+Date: 2023/9/7 18:20
 Desc: 新浪财经-美股指数行情
 https://stock.finance.sina.com.cn/usstock/quotes/.IXIC.html
 """
-
 import pandas as pd
 import requests
 from py_mini_racer import py_mini_racer
@@ -19,7 +18,7 @@ def index_us_stock_sina(symbol: str = ".INX") -> pd.DataFrame:
     """
     新浪财经-美股指数行情
     https://stock.finance.sina.com.cn/usstock/quotes/.IXIC.html
-    :param symbol: choice of {".IXIC", ".DJI", ".INX", ".NDX"}
+    :param symbol: choice of {".IXIC", ".DJI", ".INX"}
     :type symbol: str
     :return: 美股指数行情
     :rtype: pandas.DataFrame

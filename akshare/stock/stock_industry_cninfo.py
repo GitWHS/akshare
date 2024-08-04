@@ -1,12 +1,11 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 """
-Date: 2024/5/19 18:34
+Date: 2023/5/29 23:34
 Desc: 巨潮资讯-行业分类数据
-https://webapi.cninfo.com.cn/#/apiDoc
-https://webapi.cninfo.com.cn/api/stock/p_stock2110
+http://webapi.cninfo.com.cn/#/apiDoc
+http://webapi.cninfo.com.cn/api/stock/p_stock2110
 """
-
 import numpy as np
 import pandas as pd
 import requests
@@ -24,7 +23,7 @@ def _get_file_content_ths(file: str = "cninfo.js") -> str:
     :rtype: str
     """
     setting_file_path = get_ths_js(file)
-    with open(setting_file_path, encoding="utf-8") as f:
+    with open(setting_file_path) as f:
         file_data = f.read()
     return file_data
 
@@ -32,10 +31,9 @@ def _get_file_content_ths(file: str = "cninfo.js") -> str:
 def stock_industry_category_cninfo(symbol: str = "巨潮行业分类标准") -> pd.DataFrame:
     """
     巨潮资讯-行业分类数据
-    https://webapi.cninfo.com.cn/#/apiDoc
+    http://webapi.cninfo.com.cn/#/apiDoc
     查询 p_public0002 接口
-    :param symbol: 行业类型; choice of {"证监会行业分类标准", "巨潮行业分类标准", "申银万国行业分类标准",
-    "新财富行业分类标准", "国资委行业分类标准", "巨潮产业细分标准", "天相行业分类标准", "全球行业分类标准"}
+    :param symbol: 行业类型; choice of {"证监会行业分类标准", "巨潮行业分类标准", "申银万国行业分类标准", "新财富行业分类标准", "国资委行业分类标准", "巨潮产业细分标准", "天相行业分类标准", "全球行业分类标准"}
     :type symbol: str
     :return: 行业分类数据
     :rtype: pandas.DataFrame
@@ -50,7 +48,7 @@ def stock_industry_category_cninfo(symbol: str = "巨潮行业分类标准") -> 
         "天相行业分类标准": "008007",
         "全球行业分类标准": "008008",
     }
-    url = "https://webapi.cninfo.com.cn/api/stock/p_public0002"
+    url = "http://webapi.cninfo.com.cn/api/stock/p_public0002"
     params = {"indcode": "", "indtype": symbol_map[symbol], "format": "json"}
     js_code = py_mini_racer.MiniRacer()
     js_content = _get_file_content_ths("cninfo.js")
@@ -64,12 +62,11 @@ def stock_industry_category_cninfo(symbol: str = "巨潮行业分类标准") -> 
         "Content-Length": "0",
         "Host": "webapi.cninfo.com.cn",
         "Accept-Enckey": mcode,
-        "Origin": "https://webapi.cninfo.com.cn",
+        "Origin": "http://webapi.cninfo.com.cn",
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
-        "Referer": "https://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "Referer": "http://webapi.cninfo.com.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     r = requests.get(url, params=params, headers=headers)
@@ -92,13 +89,11 @@ def stock_industry_category_cninfo(symbol: str = "巨潮行业分类标准") -> 
     g = tmp.groupby("len")
     level = 0
     for k in g.groups.keys():
-        temp_df.loc[temp_df["类目编码"].isin(g.get_group(k)["类目编码"]), "Level"] = (
-            level
-        )
+        temp_df.loc[temp_df["类目编码"].isin(g.get_group(k)["类目编码"]), "Level"] = level
         level += 1
     temp_df["Level"] = temp_df["Level"].astype(int)
     temp_df.rename(columns={"Level": "分级"}, inplace=True)
-    temp_df["终止日期"] = pd.to_datetime(temp_df["终止日期"], errors="coerce").dt.date
+    temp_df["终止日期"] = pd.to_datetime(temp_df["终止日期"]).dt.date
     return temp_df
 
 
@@ -109,7 +104,7 @@ def stock_industry_change_cninfo(
 ) -> pd.DataFrame:
     """
     巨潮资讯-上市公司行业归属的变动情况
-    https://webapi.cninfo.com.cn/#/apiDoc
+    http://webapi.cninfo.com.cn/#/apiDoc
     查询 p_stock2110 接口
     :param symbol: 股票代码
     :type symbol: str
@@ -120,7 +115,7 @@ def stock_industry_change_cninfo(
     :return: 行业归属的变动情况
     :rtype: pandas.DataFrame
     """
-    url = "https://webapi.cninfo.com.cn/api/stock/p_stock2110"
+    url = "http://webapi.cninfo.com.cn/api/stock/p_stock2110"
     params = {
         "scode": symbol,
         "sdate": "-".join([start_date[:4], start_date[4:6], start_date[6:]]),
@@ -139,12 +134,11 @@ def stock_industry_change_cninfo(
         "Content-Length": "0",
         "Host": "webapi.cninfo.com.cn",
         "Accept-Enckey": mcode,
-        "Origin": "https://webapi.cninfo.com.cn",
+        "Origin": "http://webapi.cninfo.com.cn",
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
-        "Referer": "https://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "Referer": "http://webapi.cninfo.com.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     r = requests.post(url, params=params, headers=headers)

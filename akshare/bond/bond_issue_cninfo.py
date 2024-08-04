@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 """
-Date: 2024/6/19 22:00
+Date: 2023/6/12 15:00
 Desc: 巨潮资讯-数据中心-专题统计-债券报表-债券发行
 http://webapi.cninfo.com.cn/#/thematicStatistics
 """
+import time
 
 import pandas as pd
 import requests
@@ -22,7 +23,7 @@ def _get_file_content_cninfo(file: str = "cninfo.js") -> str:
     :rtype: str
     """
     setting_file_path = get_ths_js(file)
-    with open(setting_file_path, encoding="utf-8") as f:
+    with open(setting_file_path) as f:
         file_data = f.read()
     return file_data
 
@@ -57,8 +58,7 @@ def bond_treasure_issue_cninfo(
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     params = {
@@ -107,12 +107,8 @@ def bond_treasure_issue_cninfo(
             "债券名称",
         ]
     ]
-    temp_df["发行起始日"] = pd.to_datetime(
-        temp_df["发行起始日"], errors="coerce"
-    ).dt.date
-    temp_df["发行终止日"] = pd.to_datetime(
-        temp_df["发行终止日"], errors="coerce"
-    ).dt.date
+    temp_df["发行起始日"] = pd.to_datetime(temp_df["发行起始日"], errors="coerce").dt.date
+    temp_df["发行终止日"] = pd.to_datetime(temp_df["发行终止日"], errors="coerce").dt.date
     temp_df["缴款日"] = pd.to_datetime(temp_df["缴款日"], errors="coerce").dt.date
     temp_df["公告日期"] = pd.to_datetime(temp_df["公告日期"], errors="coerce").dt.date
     temp_df["计划发行总量"] = pd.to_numeric(temp_df["计划发行总量"], errors="coerce")
@@ -137,6 +133,7 @@ def bond_local_government_issue_cninfo(
     :rtype: pandas.DataFrame
     """
     url = "http://webapi.cninfo.com.cn/api/sysapi/p_sysapi1121"
+    random_time_str = str(int(time.time()))
     js_code = py_mini_racer.MiniRacer()
     js_content = _get_file_content_cninfo("cninfo.js")
     js_code.eval(js_content)
@@ -153,8 +150,7 @@ def bond_local_government_issue_cninfo(
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     params = {
@@ -203,12 +199,8 @@ def bond_local_government_issue_cninfo(
             "债券名称",
         ]
     ]
-    temp_df["发行起始日"] = pd.to_datetime(
-        temp_df["发行起始日"], errors="coerce"
-    ).dt.date
-    temp_df["发行终止日"] = pd.to_datetime(
-        temp_df["发行终止日"], errors="coerce"
-    ).dt.date
+    temp_df["发行起始日"] = pd.to_datetime(temp_df["发行起始日"], errors="coerce").dt.date
+    temp_df["发行终止日"] = pd.to_datetime(temp_df["发行终止日"], errors="coerce").dt.date
     temp_df["缴款日"] = pd.to_datetime(temp_df["缴款日"], errors="coerce").dt.date
     temp_df["公告日期"] = pd.to_datetime(temp_df["公告日期"], errors="coerce").dt.date
     temp_df["计划发行总量"] = pd.to_numeric(temp_df["计划发行总量"], errors="coerce")
@@ -249,8 +241,7 @@ def bond_corporate_issue_cninfo(
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     params = {
@@ -304,12 +295,8 @@ def bond_corporate_issue_cninfo(
         ]
     ]
     temp_df["公告日期"] = pd.to_datetime(temp_df["公告日期"], errors="coerce").dt.date
-    temp_df["交易所网上发行起始日"] = pd.to_datetime(
-        temp_df["交易所网上发行起始日"], errors="coerce"
-    ).dt.date
-    temp_df["交易所网上发行终止日"] = pd.to_datetime(
-        temp_df["交易所网上发行终止日"], errors="coerce"
-    ).dt.date
+    temp_df["交易所网上发行起始日"] = pd.to_datetime(temp_df["交易所网上发行起始日"], errors="coerce").dt.date
+    temp_df["交易所网上发行终止日"] = pd.to_datetime(temp_df["交易所网上发行终止日"], errors="coerce").dt.date
     temp_df["计划发行总量"] = pd.to_numeric(temp_df["计划发行总量"], errors="coerce")
     temp_df["实际发行总量"] = pd.to_numeric(temp_df["实际发行总量"], errors="coerce")
     temp_df["发行面值"] = pd.to_numeric(temp_df["发行面值"], errors="coerce")
@@ -349,8 +336,7 @@ def bond_cov_issue_cninfo(
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     params = {
@@ -432,47 +418,23 @@ def bond_cov_issue_cninfo(
         ]
     ]
     temp_df["公告日期"] = pd.to_datetime(temp_df["公告日期"], errors="coerce").dt.date
-    temp_df["发行起始日"] = pd.to_datetime(
-        temp_df["发行起始日"], errors="coerce"
-    ).dt.date
-    temp_df["发行终止日"] = pd.to_datetime(
-        temp_df["发行终止日"], errors="coerce"
-    ).dt.date
-    temp_df["转股开始日期"] = pd.to_datetime(
-        temp_df["转股开始日期"], errors="coerce"
-    ).dt.date
-    temp_df["转股终止日期"] = pd.to_datetime(
-        temp_df["转股终止日期"], errors="coerce"
-    ).dt.date
-    temp_df["转股终止日期"] = pd.to_datetime(
-        temp_df["转股终止日期"], errors="coerce"
-    ).dt.date
-    temp_df["网上申购日期"] = pd.to_datetime(
-        temp_df["网上申购日期"], errors="coerce"
-    ).dt.date
-    temp_df["网上申购中签结果公告日及退款日"] = pd.to_datetime(
-        temp_df["网上申购中签结果公告日及退款日"], errors="coerce"
-    ).dt.date
-    temp_df["债权登记日"] = pd.to_datetime(
-        temp_df["债权登记日"], errors="coerce"
-    ).dt.date
-    temp_df["优先申购日"] = pd.to_datetime(
-        temp_df["优先申购日"], errors="coerce"
-    ).dt.date
-    temp_df["优先申购缴款日"] = pd.to_datetime(
-        temp_df["优先申购缴款日"], errors="coerce"
-    ).dt.date
+    temp_df["发行起始日"] = pd.to_datetime(temp_df["发行起始日"], errors="coerce").dt.date
+    temp_df["发行终止日"] = pd.to_datetime(temp_df["发行终止日"], errors="coerce").dt.date
+    temp_df["转股开始日期"] = pd.to_datetime(temp_df["转股开始日期"], errors="coerce").dt.date
+    temp_df["转股终止日期"] = pd.to_datetime(temp_df["转股终止日期"], errors="coerce").dt.date
+    temp_df["转股终止日期"] = pd.to_datetime(temp_df["转股终止日期"], errors="coerce").dt.date
+    temp_df["网上申购日期"] = pd.to_datetime(temp_df["网上申购日期"], errors="coerce").dt.date
+    temp_df["网上申购中签结果公告日及退款日"] = pd.to_datetime(temp_df["网上申购中签结果公告日及退款日"], errors="coerce").dt.date
+    temp_df["债权登记日"] = pd.to_datetime(temp_df["债权登记日"], errors="coerce").dt.date
+    temp_df["优先申购日"] = pd.to_datetime(temp_df["优先申购日"], errors="coerce").dt.date
+    temp_df["优先申购缴款日"] = pd.to_datetime(temp_df["优先申购缴款日"], errors="coerce").dt.date
     temp_df["计划发行总量"] = pd.to_numeric(temp_df["计划发行总量"], errors="coerce")
     temp_df["实际发行总量"] = pd.to_numeric(temp_df["实际发行总量"], errors="coerce")
     temp_df["发行面值"] = pd.to_numeric(temp_df["发行面值"], errors="coerce")
     temp_df["发行价格"] = pd.to_numeric(temp_df["发行价格"], errors="coerce")
     temp_df["初始转股价格"] = pd.to_numeric(temp_df["初始转股价格"], errors="coerce")
-    temp_df["网上申购数量上限"] = pd.to_numeric(
-        temp_df["网上申购数量上限"], errors="coerce"
-    )
-    temp_df["网上申购数量下限"] = pd.to_numeric(
-        temp_df["网上申购数量下限"], errors="coerce"
-    )
+    temp_df["网上申购数量上限"] = pd.to_numeric(temp_df["网上申购数量上限"], errors="coerce")
+    temp_df["网上申购数量下限"] = pd.to_numeric(temp_df["网上申购数量下限"], errors="coerce")
     temp_df["网上申购单位"] = pd.to_numeric(temp_df["网上申购单位"], errors="coerce")
     temp_df["配售价格"] = pd.to_numeric(temp_df["配售价格"], errors="coerce")
     return temp_df
@@ -502,8 +464,7 @@ def bond_cov_stock_issue_cninfo() -> pd.DataFrame:
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://webapi.cninfo.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/93.0.4577.63 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
     }
     r = requests.post(url, headers=headers)
@@ -539,12 +500,8 @@ def bond_cov_stock_issue_cninfo() -> pd.DataFrame:
         ]
     ]
     temp_df["公告日期"] = pd.to_datetime(temp_df["公告日期"], errors="coerce").dt.date
-    temp_df["自愿转换期起始日"] = pd.to_datetime(
-        temp_df["自愿转换期起始日"], errors="coerce"
-    ).dt.date
-    temp_df["自愿转换期终止日"] = pd.to_datetime(
-        temp_df["自愿转换期终止日"], errors="coerce"
-    ).dt.date
+    temp_df["自愿转换期起始日"] = pd.to_datetime(temp_df["自愿转换期起始日"], errors="coerce").dt.date
+    temp_df["自愿转换期终止日"] = pd.to_datetime(temp_df["自愿转换期终止日"], errors="coerce").dt.date
     temp_df["转股价格"] = pd.to_numeric(temp_df["转股价格"], errors="coerce")
     return temp_df
 

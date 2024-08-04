@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2023/11/17 17:00
+Date: 2023/10/1 13:00
 Desc: 商品期权数据
 说明：
 (1) 价格：自2019年12月02日起，纤维板报价单位由元/张改为元/立方米
@@ -13,14 +13,13 @@ Desc: 商品期权数据
 (7) 合约系列：具有相同月份标的期货合约的所有期权合约的统称
 (8) 隐含波动率：根据期权市场价格，利用期权定价模型计算的标的期货合约价格波动率
 """
-
 import datetime
 import warnings
 from io import StringIO, BytesIO
-from typing import Tuple, Any
 
-import pandas as pd
 import requests
+import pandas as pd
+from typing import Tuple, Any
 
 from akshare.option.cons import (
     get_calendar,
@@ -144,7 +143,6 @@ def option_czce_daily(
 ) -> pd.DataFrame:
     """
     郑州商品交易所-期权-日频行情数据
-
     :param trade_date: 交易日
     :type trade_date: str
     :param symbol: choice of {"白糖期权", "棉花期权", "甲醇期权", "PTA期权", "菜籽粕期权", "动力煤期权", "菜籽油期权", "花生期权"}
@@ -156,7 +154,7 @@ def option_czce_daily(
     day = convert_date(trade_date) if trade_date is not None else datetime.date.today()
     if day.strftime("%Y%m%d") not in calendar:
         warnings.warn("{}非交易日".format(day.strftime("%Y%m%d")))
-        return pd.DataFrame()
+        return
     if day > datetime.date(2010, 8, 24):
         url = CZCE_DAILY_OPTION_URL_3.format(day.strftime("%Y"), day.strftime("%Y%m%d"))
         try:
@@ -191,36 +189,12 @@ def option_czce_daily(
                 temp_df = table_df[table_df.iloc[:, 0].str.contains("PK")]
                 temp_df.reset_index(inplace=True, drop=True)
                 return temp_df.iloc[:-1, :]
-            elif symbol == "棉花期权":
+            else:
                 temp_df = table_df[table_df.iloc[:, 0].str.contains("CF")]
                 temp_df.reset_index(inplace=True, drop=True)
                 return temp_df.iloc[:-1, :]
-            elif symbol == "短纤期权":
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("PF")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-            elif symbol == "纯碱期权":
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("SA")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-            elif symbol == "锰硅期权":
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("SM")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-            elif symbol == "硅铁期权":
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("SF")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-            elif symbol == "尿素期权":
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("UR")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-            else:
-                temp_df = table_df[table_df.iloc[:, 0].str.contains("AP")]
-                temp_df.reset_index(inplace=True, drop=True)
-                return temp_df.iloc[:-1, :]
-        except:  # noqa: E722
-            return pd.DataFrame()
+        except:
+            return
 
 
 def option_shfe_daily(
@@ -228,7 +202,6 @@ def option_shfe_daily(
 ) -> pd.DataFrame:
     """
     上海期货交易所-期权-日频行情数据
-    https://tsite.shfe.com.cn/statements/dataview.html?paramid=kxQ
     :param trade_date: 交易日
     :type trade_date: str
     :param symbol: choice of {"铜期权", "天胶期权", "黄金期权", "铝期权", "锌期权"}
@@ -240,7 +213,7 @@ def option_shfe_daily(
     day = convert_date(trade_date) if trade_date is not None else datetime.date.today()
     if day.strftime("%Y%m%d") not in calendar:
         warnings.warn("%s非交易日" % day.strftime("%Y%m%d"))
-        return pd.DataFrame()
+        return
     if day > datetime.date(2010, 8, 24):
         url = SHFE_OPTION_URL.format(day.strftime("%Y%m%d"))
         try:
@@ -332,7 +305,7 @@ def option_shfe_daily(
             contract_df.reset_index(inplace=True, drop=True)
             volatility_df.reset_index(inplace=True, drop=True)
             return contract_df, volatility_df
-        except:  # noqa: E722
+        except:
             return
 
 
@@ -366,8 +339,7 @@ def option_gfex_daily(symbol: str = "工业硅", trade_date: str = "20230724"):
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/108.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
         "content-type": "application/x-www-form-urlencoded",
     }
@@ -418,7 +390,7 @@ def option_gfex_daily(symbol: str = "工业硅", trade_date: str = "20230724"):
             "隐含波动率",
         ]
     ]
-    temp_df = temp_df[temp_df["商品名称"].str.contains(symbol)]
+    temp_df = temp_df[temp_df['商品名称'].str.contains(symbol)]
     temp_df.reset_index(inplace=True, drop=True)
     return temp_df
 
@@ -457,8 +429,7 @@ def option_gfex_vol_daily(symbol: str = "碳酸锂", trade_date: str = "20230724
         "Pragma": "no-cache",
         "Proxy-Connection": "keep-alive",
         "Referer": "http://www.gfex.com.cn/gfex/rihq/hqsj_tjsj.shtml",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/108.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
         "content-type": "application/x-www-form-urlencoded",
     }
@@ -479,7 +450,7 @@ def option_gfex_vol_daily(symbol: str = "碳酸锂", trade_date: str = "20230724
             "隐含波动率",
         ]
     ]
-    temp_df = temp_df[temp_df["合约系列"].str.contains(symbol_code_map[symbol])]
+    temp_df = temp_df[temp_df['合约系列'].str.contains(symbol_code_map[symbol])]
     temp_df.reset_index(inplace=True, drop=True)
     return temp_df
 
@@ -512,13 +483,8 @@ if __name__ == "__main__":
     print(option_shfe_daily_one)
     print(option_shfe_daily_two)
 
-    option_gfex_daily_df = option_gfex_daily(symbol="工业硅", trade_date="20240102")
+    option_gfex_daily_df = option_gfex_daily(symbol="工业硅", trade_date="20230418")
     print(option_gfex_daily_df)
 
-    option_gfex_vol_daily_df = option_gfex_vol_daily(
-        symbol="工业硅", trade_date="20230418"
-    )
+    option_gfex_vol_daily_df = option_gfex_vol_daily(symbol="工业硅", trade_date="20230418")
     print(option_gfex_vol_daily_df)
-
-    option_czce_daily_df = option_czce_daily(symbol="短纤期权", trade_date="20231116")
-    print(option_czce_daily_df)

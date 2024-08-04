@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/3/20 15:00
+Date: 2023/7/3 20:18
 Desc: 东方财富-LOF 行情
 https://quote.eastmoney.com/center/gridlist.html#fund_lof
 https://quote.eastmoney.com/sz166009.html
 """
-
 from functools import lru_cache
 
 import pandas as pd
@@ -63,7 +62,7 @@ def fund_lof_spot_em() -> pd.DataFrame:
         "fid": "f3",
         "fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407",
         "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,"
-        "f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152",
+        "f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f297,f124",
         "_": "1672806290972",
     }
     r = requests.get(url, params=params)
@@ -85,6 +84,8 @@ def fund_lof_spot_em() -> pd.DataFrame:
             "f8": "换手率",
             "f21": "流通市值",
             "f20": "总市值",
+            "f297": "数据日期",
+            "f124": "更新时间",
         },
         inplace=True,
     )
@@ -104,6 +105,8 @@ def fund_lof_spot_em() -> pd.DataFrame:
             "换手率",
             "流通市值",
             "总市值",
+            "数据日期",
+            "更新时间",
         ]
     ]
     temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
@@ -118,6 +121,16 @@ def fund_lof_spot_em() -> pd.DataFrame:
     temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
     temp_df["流通市值"] = pd.to_numeric(temp_df["流通市值"], errors="coerce")
     temp_df["总市值"] = pd.to_numeric(temp_df["总市值"], errors="coerce")
+    temp_df["数据日期"] = pd.to_datetime(
+        temp_df["数据日期"], format="%Y%m%d", errors="coerce"
+    )
+    temp_df["更新时间"] = (
+        pd.to_datetime(temp_df["更新时间"], unit="s", errors="coerce")
+        .dt.tz_localize("UTC")
+        .dt.tz_convert("Asia/Shanghai")
+    )
+
+
     return temp_df
 
 
@@ -193,11 +206,10 @@ def fund_lof_hist_em(
 
 
 def fund_lof_hist_min_em(
-    symbol: str = "166009",
-    start_date: str = "1979-09-01 09:32:00",
-    end_date: str = "2222-01-01 09:32:00",
+    symbol: str = "159707",
     period: str = "5",
     adjust: str = "",
+    secid = ""
 ) -> pd.DataFrame:
     """
     东方财富-LOF 分时行情
@@ -245,10 +257,10 @@ def fund_lof_hist_min_em(
             "最低",
             "成交量",
             "成交额",
-            "均价",
+            "最新价",
         ]
         temp_df.index = pd.to_datetime(temp_df["时间"])
-        temp_df = temp_df[start_date:end_date]
+        # temp_df = temp_df[start_date:end_date]
         temp_df.reset_index(drop=True, inplace=True)
         temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
         temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
@@ -256,8 +268,8 @@ def fund_lof_hist_min_em(
         temp_df["最低"] = pd.to_numeric(temp_df["最低"], errors="coerce")
         temp_df["成交量"] = pd.to_numeric(temp_df["成交量"], errors="coerce")
         temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
-        temp_df["均价"] = pd.to_numeric(temp_df["均价"], errors="coerce")
-        temp_df["时间"] = pd.to_datetime(temp_df["时间"]).astype(str)
+        temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
+        temp_df["时间"] = pd.to_datetime(temp_df["时间"])
         return temp_df
     else:
         url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
@@ -291,7 +303,7 @@ def fund_lof_hist_min_em(
             "换手率",
         ]
         temp_df.index = pd.to_datetime(temp_df["时间"])
-        temp_df = temp_df[start_date:end_date]
+        # temp_df = temp_df[start_date:end_date]
         temp_df.reset_index(drop=True, inplace=True)
         temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
         temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
@@ -303,7 +315,7 @@ def fund_lof_hist_min_em(
         temp_df["涨跌幅"] = pd.to_numeric(temp_df["涨跌幅"], errors="coerce")
         temp_df["涨跌额"] = pd.to_numeric(temp_df["涨跌额"], errors="coerce")
         temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
-        temp_df["时间"] = pd.to_datetime(temp_df["时间"]).astype(str)
+        temp_df["时间"] = pd.to_datetime(temp_df["时间"])
         temp_df = temp_df[
             [
                 "时间",
@@ -355,9 +367,9 @@ if __name__ == "__main__":
 
     fund_lof_hist_min_em_df = fund_lof_hist_min_em(
         symbol="166009",
-        period="1",
-        adjust="",
-        start_date="2024-03-20 09:30:00",
-        end_date="2024-03-20 14:40:00",
+        period="5",
+        adjust="hfq",
+        start_date="2023-07-01 09:32:00",
+        end_date="2023-07-04 14:40:00",
     )
     print(fund_lof_hist_min_em_df)

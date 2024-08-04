@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/1/16 15:30
+Date: 2023/5/16 18:20
 Desc: 同花顺-港股-分红派息
-https://stockpage.10jqka.com.cn/HK0700/bonus/
+http://stockpage.10jqka.com.cn/HK0700/bonus/
 """
-from io import StringIO
-
 import pandas as pd
 import requests
 
@@ -14,13 +12,13 @@ import requests
 def stock_hk_fhpx_detail_ths(symbol: str = "0700") -> pd.DataFrame:
     """
     同花顺-港股-分红派息
-    https://stockpage.10jqka.com.cn/HK0700/bonus/
+    http://stockpage.10jqka.com.cn/HK0700/bonus/
     :param symbol: 港股代码
     :type symbol: str
     :return: 分红派息
     :rtype: pandas.DataFrame
     """
-    url = f"https://basic.10jqka.com.cn/176/HK{symbol}/bonus.html"
+    url = f"http://basic.10jqka.com.cn/176/HK{symbol}/bonus.html"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -28,7 +26,7 @@ def stock_hk_fhpx_detail_ths(symbol: str = "0700") -> pd.DataFrame:
     }
     r = requests.get(url, headers=headers)
     r.encoding = "utf-8"
-    temp_df = pd.read_html(StringIO(r.text))[0]
+    temp_df = pd.read_html(r.text)[0]
     temp_df.columns = [
         "公告日期",
         "方案",
@@ -57,10 +55,9 @@ def stock_hk_fhpx_detail_ths(symbol: str = "0700") -> pd.DataFrame:
     temp_df["过户日期起止日-截止"] = pd.to_datetime(
         temp_df["过户日期起止日-截止"], format="%Y-%m-%d", errors="coerce"
     ).dt.date
-    temp_df.sort_values(['公告日期'], inplace=True, ignore_index=True)
     return temp_df
 
 
 if __name__ == "__main__":
-    stock_hk_fhpx_detail_ths_df = stock_hk_fhpx_detail_ths(symbol="0700")
+    stock_hk_fhpx_detail_ths_df = stock_hk_fhpx_detail_ths(symbol="0968")
     print(stock_hk_fhpx_detail_ths_df)

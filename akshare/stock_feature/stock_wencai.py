@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/2/27 17:00
+Date: 2023/8/17 14:30
 Desc: 问财-热门股票排名
 https://www.iwencai.com/unifiedwap/home/index
 """
 import pandas as pd
 import requests
-
-from akshare.utils.tqdm import get_tqdm
+from tqdm import tqdm
 
 
 def stock_hot_rank_wc(date: str = "20230815") -> pd.DataFrame:
@@ -48,7 +47,6 @@ def stock_hot_rank_wc(date: str = "20230815") -> pd.DataFrame:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
     }
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, 51), leave=False):
         params.update(
             {
@@ -100,5 +98,5 @@ def stock_hot_rank_wc(date: str = "20230815") -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    stock_hot_rank_wc_df = stock_hot_rank_wc(date="20240227")
+    stock_hot_rank_wc_df = stock_hot_rank_wc(date="20230816")
     print(stock_hot_rank_wc_df)

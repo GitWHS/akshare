@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/3/26 17:30
+Date: 2023/7/18 17:40
 Desc: 东方财富-ETF行情
 https://quote.eastmoney.com/sh513500.html
 """
-
 from functools import lru_cache
 
 import pandas as pd
 import requests
-
 
 @lru_cache()
 def _fund_etf_code_id_map_em() -> dict:
@@ -35,7 +33,7 @@ def _fund_etf_code_id_map_em() -> dict:
         "fields": "f12,f13",
         "_": "1672806290972",
     }
-    r = requests.get(url, timeout=15, params=params)
+    r = requests.get(url, params=params)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))
@@ -71,7 +69,7 @@ def fund_etf_spot_em() -> pd.DataFrame:
         ),
         "_": "1672806290972",
     }
-    r = requests.get(url, timeout=15, params=params)
+    r = requests.get(url, params=params)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     temp_df.rename(
@@ -262,17 +260,17 @@ def fund_etf_hist_em(
     try:
         market_id = code_id_dict[symbol]
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, params=params)
         data_json = r.json()
     except KeyError:
         market_id = 1
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, params=params)
         data_json = r.json()
         if not data_json["data"]:
             market_id = 0
             params.update({"secid": f"{market_id}.{symbol}"})
-            r = requests.get(url, timeout=15, params=params)
+            r = requests.get(url, params=params)
             data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -290,7 +288,7 @@ def fund_etf_hist_em(
         "涨跌额",
         "换手率",
     ]
-    temp_df.index = pd.to_datetime(temp_df["日期"], errors="coerce")
+    temp_df.index = pd.to_datetime(temp_df["日期"])
     temp_df.reset_index(inplace=True, drop=True)
     temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
     temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
@@ -307,10 +305,9 @@ def fund_etf_hist_em(
 
 def fund_etf_hist_min_em(
     symbol: str = "159707",
-    start_date: str = "1979-09-01 09:32:00",
-    end_date: str = "2222-01-01 09:32:00",
     period: str = "5",
     adjust: str = "",
+    secid = ""
 ) -> pd.DataFrame:
     """
     东方财富-ETF 行情
@@ -328,17 +325,18 @@ def fund_etf_hist_min_em(
     :return: 每日分时行情
     :rtype: pandas.DataFrame
     """
-    code_id_dict = _fund_etf_code_id_map_em()
-    # 商品期货类 ETF
-    code_id_dict.update(
-        {
-            "159980": "0",
-            "159981": "0",
-            "159985": "0",
-            "511090": "1",
-            "511220": "1",
-        }
-    )
+    if secid == "":
+        code_id_dict = _fund_etf_code_id_map_em()
+        secid = code_id_dict.get(symbol, "")
+    if secid == "":
+        for secid in [0, 1]:
+            try:
+                print(secid, symbol)
+                res = fund_etf_hist_min_em(symbol, period, adjust, secid)
+                break
+            except:
+                pass
+        return res
     adjust_map = {
         "": "0",
         "qfq": "1",
@@ -352,10 +350,10 @@ def fund_etf_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "ndays": "5",
             "iscr": "0",
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "_": "1623766962675",
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -368,10 +366,10 @@ def fund_etf_hist_min_em(
             "最低",
             "成交量",
             "成交额",
-            "均价",
+            "最新价",
         ]
         temp_df.index = pd.to_datetime(temp_df["时间"])
-        temp_df = temp_df[start_date:end_date]
+        # temp_df = temp_df[start_date:end_date]
         temp_df.reset_index(drop=True, inplace=True)
         temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
         temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
@@ -379,8 +377,8 @@ def fund_etf_hist_min_em(
         temp_df["最低"] = pd.to_numeric(temp_df["最低"], errors="coerce")
         temp_df["成交量"] = pd.to_numeric(temp_df["成交量"], errors="coerce")
         temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
-        temp_df["均价"] = pd.to_numeric(temp_df["均价"], errors="coerce")
-        temp_df["时间"] = pd.to_datetime(temp_df["时间"]).astype(str)
+        temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
+        temp_df["时间"] = pd.to_datetime(temp_df["时间"])
         return temp_df
     else:
         url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
@@ -390,12 +388,12 @@ def fund_etf_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "klt": period,
             "fqt": adjust_map[adjust],
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "beg": "0",
             "end": "20500000",
             "_": "1630930917857",
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
@@ -414,7 +412,7 @@ def fund_etf_hist_min_em(
             "换手率",
         ]
         temp_df.index = pd.to_datetime(temp_df["时间"])
-        temp_df = temp_df[start_date:end_date]
+        # temp_df = temp_df[start_date:end_date]
         temp_df.reset_index(drop=True, inplace=True)
         temp_df["开盘"] = pd.to_numeric(temp_df["开盘"], errors="coerce")
         temp_df["收盘"] = pd.to_numeric(temp_df["收盘"], errors="coerce")
@@ -426,7 +424,7 @@ def fund_etf_hist_min_em(
         temp_df["涨跌幅"] = pd.to_numeric(temp_df["涨跌幅"], errors="coerce")
         temp_df["涨跌额"] = pd.to_numeric(temp_df["涨跌额"], errors="coerce")
         temp_df["换手率"] = pd.to_numeric(temp_df["换手率"], errors="coerce")
-        temp_df["时间"] = pd.to_datetime(temp_df["时间"]).astype(str)
+        temp_df["时间"] = pd.to_datetime(temp_df["时间"])
         temp_df = temp_df[
             [
                 "时间",
@@ -448,39 +446,38 @@ def fund_etf_hist_min_em(
 if __name__ == "__main__":
     fund_etf_spot_em_df = fund_etf_spot_em()
     print(fund_etf_spot_em_df)
-
-    fund_etf_hist_hfq_em_df = fund_etf_hist_em(
-        symbol="513500",
-        period="daily",
-        start_date="20000101",
-        end_date="20230201",
-        adjust="hfq",
-    )
-    print(fund_etf_hist_hfq_em_df)
-
-    fund_etf_hist_qfq_em_df = fund_etf_hist_em(
-        symbol="511010",
-        period="daily",
-        start_date="20000101",
-        end_date="20230718",
-        adjust="",
-    )
-    print(fund_etf_hist_qfq_em_df)
-
-    fund_etf_hist_em_df = fund_etf_hist_em(
-        symbol="159985",
-        period="daily",
-        start_date="20000101",
-        end_date="20231211",
-        adjust="",
-    )
-    print(fund_etf_hist_em_df)
+    #
+    # fund_etf_hist_hfq_em_df = fund_etf_hist_em(
+    #     symbol="513500",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230201",
+    #     adjust="hfq",
+    # )
+    # print(fund_etf_hist_hfq_em_df)
+    #
+    # fund_etf_hist_qfq_em_df = fund_etf_hist_em(
+    #     symbol="511010",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230718",
+    #     adjust="",
+    # )
+    # print(fund_etf_hist_qfq_em_df)
+    #
+    # fund_etf_hist_em_df = fund_etf_hist_em(
+    #     symbol="513500",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230201",
+    #     adjust="",
+    # )
+    # print(fund_etf_hist_em_df)
 
     fund_etf_hist_min_em_df = fund_etf_hist_min_em(
-        symbol="511220",
-        period="1",
-        adjust="",
-        start_date="2024-03-20 09:30:00",
-        end_date="2024-03-20 17:40:00",
+        symbol="511010",
+        period="5",
+        adjust="hfq",
     )
+    _fund_etf_code_id_map_em.cache_clear()
     print(fund_etf_hist_min_em_df)

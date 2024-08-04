@@ -1,13 +1,12 @@
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 """
-Date: 2024/4/22 14:00
+Date: 2023/9/19 8:00
 Desc: 上海黄金交易所-数据资讯-行情走势
 https://www.sge.com.cn/sjzx/mrhq
 上海黄金交易所-数据资讯-上海金基准价-历史数据
 上海黄金交易所-数据资讯-上海银基准价-历史数据
 """
-
 import pandas as pd
 import requests
 
@@ -84,8 +83,8 @@ def spot_hist_sge(symbol: str = "Au99.99") -> pd.DataFrame:
         "date",
         "open",
         "close",
-        "low",
         "high",
+        "low",
     ]
 
     temp_df["date"] = pd.to_datetime(temp_df["date"], errors="coerce").dt.date

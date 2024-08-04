@@ -11,9 +11,9 @@ https://www.endata.com.cn/Video/index.html
 import json
 import os
 
-import pandas as pd
+import pandas as pd  # type: ignore
 import requests
-from py_mini_racer import py_mini_racer
+from py_mini_racer import py_mini_racer  # type: ignore
 
 
 def _get_js_path(name: str = "", module_file: str = "") -> str:

@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2024/1/6 15:00
+Date: 2023/4/6 16:44
 Desc: 东方财富网-数据中心-研究报告-盈利预测
 https://data.eastmoney.com/report/profitforecast.jshtml
 """
 import pandas as pd
 import requests
-
-from akshare.utils.tqdm import get_tqdm
+from tqdm import tqdm
 
 
 def stock_profit_forecast_em(symbol: str = "") -> pd.DataFrame:
@@ -39,7 +38,6 @@ def stock_profit_forecast_em(symbol: str = "") -> pd.DataFrame:
     data_json = r.json()
     page_num = int(data_json["result"]["pages"])
     big_df = pd.DataFrame()
-    tqdm = get_tqdm()
     for page in tqdm(range(1, page_num + 1), leave=False):
         params.update(
             {
@@ -56,6 +54,7 @@ def stock_profit_forecast_em(symbol: str = "") -> pd.DataFrame:
 
     big_df.reset_index(inplace=True)
     big_df["index"] = big_df.index + 1
+
     year1 = str(big_df["YEAR1"].mode().values[0])
     year2 = str(big_df["YEAR2"].mode().values[0])
     year3 = str(big_df["YEAR3"].mode().values[0])
