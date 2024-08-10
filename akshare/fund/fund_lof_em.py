@@ -268,6 +268,10 @@ def fund_lof_hist_min_em(
         temp_df["最低"] = pd.to_numeric(temp_df["最低"], errors="coerce")
         temp_df["成交量"] = pd.to_numeric(temp_df["成交量"], errors="coerce")
         temp_df["成交额"] = pd.to_numeric(temp_df["成交额"], errors="coerce")
+        temp_df["振幅"] = pd.to_numeric(None, errors="coerce")
+        temp_df["涨跌幅"] = pd.to_numeric(None, errors="coerce")
+        temp_df["涨跌额"] = pd.to_numeric(None, errors="coerce")
+        temp_df["换手率"] = pd.to_numeric(None, errors="coerce")
         temp_df["最新价"] = pd.to_numeric(temp_df["最新价"], errors="coerce")
         temp_df["时间"] = pd.to_datetime(temp_df["时间"])
         return temp_df
