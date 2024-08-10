@@ -148,7 +148,7 @@ def stock_news_list_info(code, code_type) -> pd.DataFrame:
                     "Art_Code": "编号",
                     "Np_dst": "文章来源",
                     "Art_Title": "新闻标题",
-                    "Art_OriginUrl": "新闻链接",
+                    "Art_Url": "新闻链接",
                 },
                 inplace=True,
             )
@@ -173,8 +173,8 @@ def stock_news_list_info(code, code_type) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    stock_news_list_info_df = stock_news_list_info("161126", 'LOF')
+    stock_news_list_info_df = stock_news_list_info("BK0428", '行业')
     print(stock_news_list_info_df)
 
-    stock_news_em_df = stock_news_em(symbol="标普")
-    print(stock_news_em_df)
+    # stock_news_em_df = stock_news_em(symbol="标普")
+    # print(stock_news_em_df)
