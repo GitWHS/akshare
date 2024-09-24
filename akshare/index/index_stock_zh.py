@@ -133,7 +133,7 @@ def stock_zh_index_spot_em(symbol: str = "上证系列指数") -> pd.DataFrame:
     :return: 指数的实时行情数据
     :rtype: pandas.DataFrame
     """
-    url = "https://48.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     symbol_map = {
         "上证系列指数": "m:1 s:2",
         "深证系列指数": "m:0 t:5",

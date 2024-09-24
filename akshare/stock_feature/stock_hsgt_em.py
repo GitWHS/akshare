@@ -95,7 +95,7 @@ def stock_hk_ggt_components_em() -> pd.DataFrame:
     :return: 港股通成份股
     :rtype: pandas.DataFrame
     """
-    url = "https://33.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "5000",

@@ -16,7 +16,7 @@ def stock_board_concept_name_em() -> pd.DataFrame:
     :return: 概念板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "http://79.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "2000",
@@ -301,7 +301,7 @@ def stock_board_concept_cons_em(stock_board_code: str = "车联网") -> pd.DataF
     :return: 板块成份
     :rtype: pandas.DataFrame
     """
-    url = "http://29.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "2000",
@@ -393,8 +393,8 @@ def stock_board_concept_cons_em(stock_board_code: str = "车联网") -> pd.DataF
 
 
 if __name__ == "__main__":
-    # stock_board_concept_em_df = stock_board_concept_name_em()
-    # print(stock_board_concept_em_df)
+    stock_board_concept_em_df = stock_board_concept_name_em()
+    print(stock_board_concept_em_df)
     #
     # stock_board_concept_hist_em_df = stock_board_concept_hist_em(
     #     symbol="绿色电力", period="daily", start_date="20220101", end_date="20230806", adjust=""
@@ -406,5 +406,5 @@ if __name__ == "__main__":
     # )
     # print(stock_board_concept_hist_min_em_df)
 
-    stock_board_concept_cons_em_df = stock_board_concept_cons_em(symbol="网络安全")
-    print(stock_board_concept_cons_em_df)
+    # stock_board_concept_cons_em_df = stock_board_concept_cons_em(symbol="网络安全")
+    # print(stock_board_concept_cons_em_df)

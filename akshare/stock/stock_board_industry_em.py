@@ -17,7 +17,7 @@ def stock_board_industry_name_em() -> pd.DataFrame:
     :return: 行业板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "http://17.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "2000",
@@ -116,7 +116,7 @@ def stock_board_industry_spot_em(symbol: str = "小金属") -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://91.push2.eastmoney.com/api/qt/stock/get"
+    url = "http://push2.eastmoney.com/api/qt/stock/get"
     field_map = {
         "f43": "最新",
         "f44": "最高",
@@ -377,7 +377,7 @@ def stock_board_industry_cons_em(stock_board_code: str = "小金属") -> pd.Data
     :return: 板块成份
     :rtype: pandas.DataFrame
     """
-    url = "http://29.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "2000",

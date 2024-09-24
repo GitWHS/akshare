@@ -18,7 +18,7 @@ def stock_zh_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://82.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -130,7 +130,7 @@ def stock_sh_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://82.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -242,7 +242,7 @@ def stock_sz_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://82.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -354,7 +354,7 @@ def stock_bj_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://82.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -583,7 +583,7 @@ def stock_cy_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://7.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -696,7 +696,7 @@ def stock_kc_a_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://7.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -809,7 +809,7 @@ def stock_zh_b_spot_em() -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://28.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -922,7 +922,7 @@ def code_id_map_em() -> dict:
     :return: 股票和市场代码
     :rtype: dict
     """
-    url = "http://80.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -1256,7 +1256,7 @@ def stock_hk_spot_em() -> pd.DataFrame:
     :return: 港股-实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://72.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -1345,7 +1345,7 @@ def stock_hk_main_board_spot_em() -> pd.DataFrame:
     :return: 港股-主板-实时行情
     :rtype: pandas.DataFrame
     """
-    url = "http://81.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -1636,7 +1636,7 @@ def stock_us_spot_em() -> pd.DataFrame:
     :return: 美股-实时行情; 延迟 15 min
     :rtype: pandas.DataFrame
     """
-    url = "http://72.push2.eastmoney.com/api/qt/clist/get"
+    url = "http://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "20000",
@@ -1899,7 +1899,7 @@ if __name__ == "__main__":
     # )
     # print(stock_zh_a_hist_df)
 
-    stock_zh_a_hist_min_em_df = stock_zh_a_hist_min_em(symbol="430017", period="5")
+    stock_zh_a_hist_min_em_df = stock_zh_a_hist_min_em(symbol="430017", period="1")
     print(stock_zh_a_hist_min_em_df)
 
     # stock_zh_a_hist_pre_min_em_df = stock_zh_a_hist_pre_min_em(symbol="833454")

@@ -18,7 +18,7 @@ def index_code_id_map_em() -> dict:
     :return: 股票和市场代码
     :rtype: dict
     """
-    url = "https://80.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "10000",
