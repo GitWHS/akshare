@@ -33,7 +33,7 @@ def _fund_etf_code_id_map_em() -> dict:
         "fields": "f12,f13",
         "_": "1672806290972",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=60)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))

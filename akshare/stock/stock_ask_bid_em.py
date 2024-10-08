@@ -33,7 +33,7 @@ def __code_id_map_em() -> dict:
         "fields": "f12",
         "_": "1623833739532",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, timeout=60)
     data_json = r.json()
     if not data_json["data"]["diff"]:
         return dict()
