@@ -1133,97 +1133,97 @@ def fund_hk_fund_hist_em(
 
 
 if __name__ == "__main__":
-    fund_purchase_em_df = fund_purchase_em()
-    print(fund_purchase_em_df)
-
-    fund_name_em_df = fund_name_em()
-    print(fund_name_em_df)
-
-    fund_info_index_em_df = fund_info_index_em(
-        symbol="债券指数", indicator="全部"
-    )
-    print(fund_info_index_em_df)
-
-    fund_open_fund_daily_em_df = fund_open_fund_daily_em()
-    print(fund_open_fund_daily_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="000212", indicator="单位净值走势"
-    )
-    print(fund_open_fund_info_em_df)
-    time.sleep(3)
+    # fund_purchase_em_df = fund_purchase_em()
+    # print(fund_purchase_em_df)
+    #
+    # fund_name_em_df = fund_name_em()
+    # print(fund_name_em_df)
+    #
+    # fund_info_index_em_df = fund_info_index_em(
+    #     symbol="债券指数", indicator="全部"
+    # )
+    # print(fund_info_index_em_df)
+    #
+    # fund_open_fund_daily_em_df = fund_open_fund_daily_em()
+    # print(fund_open_fund_daily_em_df)
+    # time.sleep(3)
 
     fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="000212", indicator="累计净值走势"
+        fund="162719", indicator="单位净值走势"
     )
     print(fund_open_fund_info_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="710001", indicator="累计收益率走势"
-    )
-    print(fund_open_fund_info_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="710001", indicator="同类排名走势"
-    )
-    print(fund_open_fund_info_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="710001", indicator="同类排名百分比"
-    )
-    print(fund_open_fund_info_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="161606", indicator="分红送配详情"
-    )
-    print(fund_open_fund_info_em_df)
-    time.sleep(3)
-
-    fund_open_fund_info_em_df = fund_open_fund_info_em(
-        fund="161725", indicator="拆分详情"
-    )
-    print(fund_open_fund_info_em_df)
-
-    fund_money_fund_daily_em_df = fund_money_fund_daily_em()
-    print(fund_money_fund_daily_em_df)
-
-    fund_money_fund_info_em_df = fund_money_fund_info_em(fund="162411")
-    print(fund_money_fund_info_em_df)
-
-    fund_financial_fund_daily_em_df = fund_financial_fund_daily_em()
-    print(fund_financial_fund_daily_em_df)
-
-    fund_financial_fund_info_em_df = fund_financial_fund_info_em(symbol="000134")
-    print(fund_financial_fund_info_em_df)
-
-    fund_graded_fund_daily_em_df = fund_graded_fund_daily_em()
-    print(fund_graded_fund_daily_em_df)
-
-    fund_graded_fund_info_em_df = fund_graded_fund_info_em(fund="150232")
-    print(fund_graded_fund_info_em_df)
-
-    fund_etf_fund_daily_em_df = fund_etf_fund_daily_em()
-    print(fund_etf_fund_daily_em_df)
-
-    fund_etf_fund_info_em_df = fund_etf_fund_info_em(
-        fund="511280", start_date="20000101", end_date="20500101"
-    )
-    print(fund_etf_fund_info_em_df)
-
-    fund_value_estimation_em_df = fund_value_estimation_em(symbol="混合型")
-    print(fund_value_estimation_em_df)
-
-    fund_hk_fund_hist_em_df = fund_hk_fund_hist_em(
-        code="1002200683", symbol="历史净值明细"
-    )
-    print(fund_hk_fund_hist_em_df)
-
-    fund_hk_fund_hist_em_df = fund_hk_fund_hist_em(
-        code="1002200683", symbol="分红送配详情"
-    )
-    print(fund_hk_fund_hist_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="000212", indicator="累计净值走势"
+    # )
+    # print(fund_open_fund_info_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="710001", indicator="累计收益率走势"
+    # )
+    # print(fund_open_fund_info_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="710001", indicator="同类排名走势"
+    # )
+    # print(fund_open_fund_info_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="710001", indicator="同类排名百分比"
+    # )
+    # print(fund_open_fund_info_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="161606", indicator="分红送配详情"
+    # )
+    # print(fund_open_fund_info_em_df)
+    # time.sleep(3)
+    #
+    # fund_open_fund_info_em_df = fund_open_fund_info_em(
+    #     fund="161725", indicator="拆分详情"
+    # )
+    # print(fund_open_fund_info_em_df)
+    #
+    # fund_money_fund_daily_em_df = fund_money_fund_daily_em()
+    # print(fund_money_fund_daily_em_df)
+    #
+    # fund_money_fund_info_em_df = fund_money_fund_info_em(fund="162411")
+    # print(fund_money_fund_info_em_df)
+    #
+    # fund_financial_fund_daily_em_df = fund_financial_fund_daily_em()
+    # print(fund_financial_fund_daily_em_df)
+    #
+    # fund_financial_fund_info_em_df = fund_financial_fund_info_em(symbol="000134")
+    # print(fund_financial_fund_info_em_df)
+    #
+    # fund_graded_fund_daily_em_df = fund_graded_fund_daily_em()
+    # print(fund_graded_fund_daily_em_df)
+    #
+    # fund_graded_fund_info_em_df = fund_graded_fund_info_em(fund="150232")
+    # print(fund_graded_fund_info_em_df)
+    #
+    # fund_etf_fund_daily_em_df = fund_etf_fund_daily_em()
+    # print(fund_etf_fund_daily_em_df)
+    #
+    # fund_etf_fund_info_em_df = fund_etf_fund_info_em(
+    #     fund="511280", start_date="20000101", end_date="20500101"
+    # )
+    # print(fund_etf_fund_info_em_df)
+    #
+    # fund_value_estimation_em_df = fund_value_estimation_em(symbol="混合型")
+    # print(fund_value_estimation_em_df)
+    #
+    # fund_hk_fund_hist_em_df = fund_hk_fund_hist_em(
+    #     code="1002200683", symbol="历史净值明细"
+    # )
+    # print(fund_hk_fund_hist_em_df)
+    #
+    # fund_hk_fund_hist_em_df = fund_hk_fund_hist_em(
+    #     code="1002200683", symbol="分红送配详情"
+    # )
+    # print(fund_hk_fund_hist_em_df)

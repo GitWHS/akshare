@@ -121,7 +121,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "f12,f14,f2,f160,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f260,f261,f124",
         ],
     }
-    url = "http://push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "fid": indicator_map[indicator][0],
         "po": "1",
@@ -155,7 +155,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "今日中单净流入-净占比",
             "今日小单净流入-净额",
             "今日小单净流入-净占比",
-            "_",
+            "更新时间",
             "今日主力净流入-净占比",
             "_",
             "_",
@@ -178,6 +178,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "今日中单净流入-净占比",
                 "今日小单净流入-净额",
                 "今日小单净流入-净占比",
+                "更新时间",
             ]
         ]
     elif indicator == "3日":
@@ -186,7 +187,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "最新价",
             "代码",
             "名称",
-            "_",
+            "更新时间",
             "3日涨跌幅",
             "_",
             "_",
@@ -219,6 +220,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "3日中单净流入-净占比",
                 "3日小单净流入-净额",
                 "3日小单净流入-净占比",
+                "更新时间",
             ]
         ]
     elif indicator == "5日":
@@ -228,7 +230,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "代码",
             "名称",
             "5日涨跌幅",
-            "_",
+            "更新时间",
             "5日主力净流入-净额",
             "5日主力净流入-净占比",
             "5日超大单净流入-净额",
@@ -260,6 +262,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "5日中单净流入-净占比",
                 "5日小单净流入-净额",
                 "5日小单净流入-净占比",
+                "更新时间",
             ]
         ]
     elif indicator == "10日":
@@ -268,7 +271,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "最新价",
             "代码",
             "名称",
-            "_",
+            "更新时间",
             "10日涨跌幅",
             "10日主力净流入-净额",
             "10日主力净流入-净占比",
@@ -301,8 +304,14 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "10日中单净流入-净占比",
                 "10日小单净流入-净额",
                 "10日小单净流入-净占比",
+                "更新时间",
             ]
         ]
+    temp_df["更新时间"] = (
+        pd.to_datetime(temp_df["更新时间"], unit="s", errors="coerce")
+        .dt.tz_localize("UTC")
+        .dt.tz_convert("Asia/Shanghai")
+    )
     return temp_df
 
 
@@ -444,9 +453,9 @@ def stock_sector_fund_flow_rank(
     temp_df = pd.DataFrame(json_data["data"]["diff"])
     if indicator == "今日":
         temp_df.columns = [
-            "-",
+            "最新价",
             "今日涨跌幅",
-            "_",
+            "代码",
             "名称",
             "今日主力净流入-净额",
             "今日超大单净流入-净额",
@@ -457,7 +466,7 @@ def stock_sector_fund_flow_rank(
             "今日中单净流入-净占比",
             "今日小单净流入-净额",
             "今日小单净流入-净占比",
-            "-",
+            "更新时间",
             "今日主力净流入-净占比",
             "今日主力净流入最大股",
             "今日主力净流入最大股代码",
@@ -466,7 +475,9 @@ def stock_sector_fund_flow_rank(
 
         temp_df = temp_df[
             [
+                "代码",
                 "名称",
+                "最新价",
                 "今日涨跌幅",
                 "今日主力净流入-净额",
                 "今日主力净流入-净占比",
@@ -479,6 +490,7 @@ def stock_sector_fund_flow_rank(
                 "今日小单净流入-净额",
                 "今日小单净流入-净占比",
                 "今日主力净流入最大股",
+                "更新时间",
             ]
         ]
         temp_df.sort_values(["今日主力净流入-净额"], ascending=False, inplace=True)
@@ -487,11 +499,11 @@ def stock_sector_fund_flow_rank(
         temp_df.rename({"index": "序号"}, axis=1, inplace=True)
     elif indicator == "5日":
         temp_df.columns = [
-            "-",
-            "_",
+            "最新价",
+            "代码",
             "名称",
             "5日涨跌幅",
-            "_",
+            "更新时间",
             "5日主力净流入-净额",
             "5日主力净流入-净占比",
             "5日超大单净流入-净额",
@@ -503,13 +515,15 @@ def stock_sector_fund_flow_rank(
             "5日小单净流入-净额",
             "5日小单净流入-净占比",
             "5日主力净流入最大股",
-            "_",
+            "5日主力净流入最大股代码",
             "_",
         ]
 
         temp_df = temp_df[
             [
+                "代码",
                 "名称",
+                "最新价",
                 "5日涨跌幅",
                 "5日主力净流入-净额",
                 "5日主力净流入-净占比",
@@ -522,6 +536,7 @@ def stock_sector_fund_flow_rank(
                 "5日小单净流入-净额",
                 "5日小单净流入-净占比",
                 "5日主力净流入最大股",
+                "更新时间",
             ]
         ]
         temp_df.sort_values(["5日主力净流入-净额"], ascending=False, inplace=True)
@@ -530,10 +545,10 @@ def stock_sector_fund_flow_rank(
         temp_df.rename({"index": "序号"}, axis=1, inplace=True)
     elif indicator == "10日":
         temp_df.columns = [
-            "-",
-            "_",
+            "最新价",
+            "代码",
             "名称",
-            "_",
+            "更新时间",
             "10日涨跌幅",
             "10日主力净流入-净额",
             "10日主力净流入-净占比",
@@ -546,13 +561,15 @@ def stock_sector_fund_flow_rank(
             "10日小单净流入-净额",
             "10日小单净流入-净占比",
             "10日主力净流入最大股",
-            "_",
+            "10日主力净流入最大股代码",
             "_",
         ]
 
         temp_df = temp_df[
             [
+                "代码",
                 "名称",
+                "最新价",
                 "10日涨跌幅",
                 "10日主力净流入-净额",
                 "10日主力净流入-净占比",
@@ -565,12 +582,20 @@ def stock_sector_fund_flow_rank(
                 "10日小单净流入-净额",
                 "10日小单净流入-净占比",
                 "10日主力净流入最大股",
+                "更新时间",
             ]
         ]
         temp_df.sort_values(["10日主力净流入-净额"], ascending=False, inplace=True)
         temp_df.reset_index(inplace=True)
         temp_df["index"] = range(1, len(temp_df) + 1)
         temp_df.rename({"index": "序号"}, axis=1, inplace=True)
+
+    temp_df["更新时间"] = (
+        pd.to_datetime(temp_df["更新时间"], unit="s", errors="coerce")
+        .dt.tz_localize("UTC")
+        .dt.tz_convert("Asia/Shanghai")
+    )
+
     return temp_df
 
 
@@ -1035,15 +1060,21 @@ if __name__ == "__main__":
     # stock_market_fund_flow_df = stock_market_fund_flow()
     # print(stock_market_fund_flow_df)
     #
-    # stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
-    #     indicator="5日", sector_type="地域资金流"
-    # )
-    # print(stock_sector_fund_flow_rank_df)
-    #
-    # stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
-    #     indicator="今日", sector_type="行业资金流"
-    # )
-    # print(stock_sector_fund_flow_rank_df)
+
+    stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
+        indicator="今日", sector_type="行业资金流"
+    )
+    print(stock_sector_fund_flow_rank_df)
+
+    stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
+        indicator="今日", sector_type="概念资金流"
+    )
+    print(stock_sector_fund_flow_rank_df)
+
+    stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
+        indicator="今日", sector_type="地域资金流"
+    )
+    print(stock_sector_fund_flow_rank_df)
     #
     # stock_sector_fund_flow_summary_df = stock_sector_fund_flow_summary(symbol="电源设备", indicator="今日")
     # print(stock_sector_fund_flow_summary_df.dtypes)
