@@ -22,10 +22,9 @@ def stock_individual_info_em(symbol: str = "603777", timeout: float = None) -> p
     :return: 股票信息
     :rtype: pandas.DataFrame
     """
-    code_id_dict = code_id_map_em()
-    code_id = code_id_dict.get(symbol)
-    if code_id:
-        try_list = [code_id]
+    market_code = 1 if symbol.startswith("6") else 0
+    if market_code == 1:
+        try_list = ["1", "0"]
     else:
         try_list = ["0", "1"]
     target_data_json = None

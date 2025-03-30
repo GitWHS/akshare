@@ -6,10 +6,13 @@ Desc: 东方财富-LOF 行情
 https://quote.eastmoney.com/center/gridlist.html#fund_lof
 https://quote.eastmoney.com/sz166009.html
 """
+
 from functools import lru_cache
 
 import pandas as pd
 import requests
+
+from akshare.utils.func import fetch_paginated_data
 
 
 @lru_cache()
@@ -52,7 +55,7 @@ def fund_lof_spot_em() -> pd.DataFrame:
     url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "5000",
+        "pz": "100",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -65,9 +68,7 @@ def fund_lof_spot_em() -> pd.DataFrame:
         "f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f297,f124",
         "_": "1672806290972",
     }
-    r = requests.get(url, params=params)
-    data_json = r.json()
-    temp_df = pd.DataFrame(data_json["data"]["diff"])
+    temp_df = fetch_paginated_data(url, params)
     temp_df.rename(
         columns={
             "f12": "代码",
@@ -227,7 +228,18 @@ def fund_lof_hist_min_em(
     :return: 每日分时行情
     :rtype: pandas.DataFrame
     """
-    code_id_dict = _fund_lof_code_id_map_em()
+    if secid == "":
+        code_id_dict = _fund_lof_code_id_map_em()
+        secid = code_id_dict.get(symbol, "")
+    if secid == "":
+        for secid in [0, 1]:
+            try:
+                print(secid, symbol)
+                res = fund_lof_hist_min_em(symbol, period, adjust, secid)
+                break
+            except:
+                pass
+        return res
     adjust_map = {
         "": "0",
         "qfq": "1",
@@ -339,41 +351,38 @@ def fund_lof_hist_min_em(
 
 
 if __name__ == "__main__":
-    fund_lof_spot_em_df = fund_lof_spot_em()
-    print(fund_lof_spot_em_df)
-
-    fund_lof_hist_em_df = fund_lof_hist_em(
-        symbol="166009",
-        period="daily",
-        start_date="20000101",
-        end_date="20230703",
-        adjust="",
-    )
-    print(fund_lof_hist_em_df)
-
-    fund_lof_hist_qfq_em_df = fund_lof_hist_em(
-        symbol="166009",
-        period="daily",
-        start_date="20000101",
-        end_date="20230703",
-        adjust="qfq",
-    )
-    print(fund_lof_hist_qfq_em_df)
-
-    fund_lof_hist_em_df = fund_lof_hist_em(
-        symbol="166009",
-        period="daily",
-        start_date="20000101",
-        end_date="20230703",
-        adjust="hfq",
-    )
-    print(fund_lof_hist_em_df)
+    # fund_lof_spot_em_df = fund_lof_spot_em()
+    # print(fund_lof_spot_em_df)
+    #
+    # fund_lof_hist_em_df = fund_lof_hist_em(
+    #     symbol="166009",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230703",
+    #     adjust="",
+    # )
+    # print(fund_lof_hist_em_df)
+    #
+    # fund_lof_hist_qfq_em_df = fund_lof_hist_em(
+    #     symbol="166009",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230703",
+    #     adjust="qfq",
+    # )
+    # print(fund_lof_hist_qfq_em_df)
+    #
+    # fund_lof_hist_em_df = fund_lof_hist_em(
+    #     symbol="166009",
+    #     period="daily",
+    #     start_date="20000101",
+    #     end_date="20230703",
+    #     adjust="hfq",
+    # )
+    # print(fund_lof_hist_em_df)
 
     fund_lof_hist_min_em_df = fund_lof_hist_min_em(
-        symbol="166009",
-        period="5",
-        adjust="hfq",
-        start_date="2023-07-01 09:32:00",
-        end_date="2023-07-04 14:40:00",
+        symbol="161831",
+        period="1",
     )
     print(fund_lof_hist_min_em_df)

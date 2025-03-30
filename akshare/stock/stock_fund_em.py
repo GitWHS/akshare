@@ -5,12 +5,16 @@ Date: 2023/8/29 8:30
 Desc: 东方财富网-数据中心-资金流向
 https://data.eastmoney.com/zjlx/detail.html
 """
+
 import json
+import math
 import time
 from functools import lru_cache
 
 import pandas as pd
 import requests
+
+from akshare.utils.tqdm import get_tqdm
 
 
 def stock_individual_fund_flow(
@@ -27,9 +31,10 @@ def stock_individual_fund_flow(
     :rtype: pandas.DataFrame
     """
     market_map = {"sh": 1, "sz": 0, "bj": 0}
-    url = "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
+    url = "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
     }
     params = {
         "lmt": "0",
@@ -125,7 +130,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
     params = {
         "fid": indicator_map[indicator][0],
         "po": "1",
-        "pz": "10000",
+        "pz": "100",
         "pn": "1",
         "np": "1",
         "fltt": "2",
@@ -136,7 +141,20 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
     }
     r = requests.get(url, params=params)
     data_json = r.json()
-    temp_df = pd.DataFrame(data_json["data"]["diff"])
+    total_page = math.ceil(data_json["data"]["total"] / 100)
+    temp_list = []
+    tqdm = get_tqdm()
+    for page in tqdm(range(1, total_page + 1), leave=False):
+        params.update(
+            {
+                "pn": page,
+            }
+        )
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
+        temp_list.append(inner_temp_df)
+    temp_df = pd.concat(temp_list, ignore_index=True)
     temp_df.reset_index(inplace=True)
     temp_df["index"] = range(1, len(temp_df) + 1)
     if indicator == "今日":
@@ -427,13 +445,14 @@ def stock_sector_fund_flow_rank(
             "f12,f14,f2,f160,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f260,f261,f124",
         ],
     }
-    url = "http://push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
     }
     params = {
         "pn": "1",
-        "pz": "5000",
+        "pz": "100",
         "po": "1",
         "np": "1",
         "ut": "b2884a393a59ad64002292a3e90d46a5",
@@ -444,13 +463,25 @@ def stock_sector_fund_flow_rank(
         "stat": indicator_map[indicator][1],
         "fields": indicator_map[indicator][2],
         "rt": "52975239",
-        "cb": "jQuery18308357908311220152_1589256588824",
         "_": int(time.time() * 1000),
     }
     r = requests.get(url, params=params, headers=headers)
-    text_data = r.text
-    json_data = json.loads(text_data[text_data.find("{") : -2])
-    temp_df = pd.DataFrame(json_data["data"]["diff"])
+    data_json = r.json()
+    total_page = math.ceil(data_json["data"]["total"] / 100)
+    temp_list = []
+    tqdm = get_tqdm()
+    for page in tqdm(range(1, total_page + 1), leave=False):
+        params.update(
+            {
+                "pn": page,
+            }
+        )
+        r = requests.get(url, params=params, timeout=15)
+        data_json = r.json()
+        inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
+        temp_list.append(inner_temp_df)
+    temp_df = pd.concat(temp_list, ignore_index=True)
+
     if indicator == "今日":
         temp_df.columns = [
             "最新价",
@@ -1060,6 +1091,8 @@ if __name__ == "__main__":
     # stock_market_fund_flow_df = stock_market_fund_flow()
     # print(stock_market_fund_flow_df)
     #
+    res = stock_individual_fund_flow_rank("今日")
+    print(res)
 
     stock_sector_fund_flow_rank_df = stock_sector_fund_flow_rank(
         indicator="今日", sector_type="行业资金流"
