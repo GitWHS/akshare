@@ -26,7 +26,7 @@ def _fund_etf_code_id_map_em() -> dict:
     url = "https://88.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "200",
+        "pz": "100",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -35,25 +35,10 @@ def _fund_etf_code_id_map_em() -> dict:
         "wbp2u": "|0|0|0|web",
         "fid": "f3",
         "fs": "b:MK0021,b:MK0022,b:MK0023,b:MK0024",
-        "fields": "f12,f13",
+        "fields": "f3,f12,f13",
         "_": "1672806290972",
     }
-    r = requests.get(url, params=params, timeout=15)
-    data_json = r.json()
-    total_page = math.ceil(data_json["data"]["total"] / 200)
-    temp_list = []
-    tqdm = get_tqdm()
-    for page in tqdm(range(1, total_page + 1), leave=False):
-        params.update(
-            {
-                "pn": page,
-            }
-        )
-        r = requests.get(url, params=params, timeout=15)
-        data_json = r.json()
-        inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
-        temp_list.append(inner_temp_df)
-    temp_df = pd.concat(temp_list, ignore_index=True)
+    temp_df = fetch_paginated_data(url, params)
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))
     return temp_dict
 
@@ -276,17 +261,17 @@ def fund_etf_hist_em(
     try:
         market_id = code_id_dict[symbol]
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
     except KeyError:
         market_id = 1
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
         if not data_json["data"]:
             market_id = 0
             params.update({"secid": f"{market_id}.{symbol}"})
-            r = requests.get(url, params=params)
+            r = requests.get(url, timeout=15, params=params)
             data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -343,11 +328,22 @@ def fund_etf_hist_min_em(
     """
     if secid == "":
         code_id_dict = _fund_etf_code_id_map_em()
+        # 商品期货类 ETF
+        code_id_dict.update(
+            {
+                "159980": "0",
+                "159981": "0",
+                "159985": "0",
+                "511090": "1",
+                "511220": "1",
+                "511380": "1",
+            }
+        )
         secid = code_id_dict.get(symbol, "")
     if secid == "":
         for secid in [0, 1]:
             try:
-                print(secid, symbol)
+                # print(secid, symbol)
                 res = fund_etf_hist_min_em(symbol, period, adjust, secid)
                 break
             except:
@@ -369,7 +365,7 @@ def fund_etf_hist_min_em(
             "secid": f"{secid}.{symbol}",
             "_": "1623766962675",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -413,7 +409,7 @@ def fund_etf_hist_min_em(
             "end": "20500000",
             "_": "1630930917857",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
@@ -499,5 +495,7 @@ if __name__ == "__main__":
         period="5",
         adjust="hfq",
     )
-    _fund_etf_code_id_map_em.cache_clear()
-    print(len(_fund_etf_code_id_map_em()))
+    print(fund_etf_hist_min_em_df)
+
+    # _fund_etf_code_id_map_em.cache_clear()
+    # print(len(_fund_etf_code_id_map_em()))

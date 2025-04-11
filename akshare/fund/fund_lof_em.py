@@ -23,24 +23,22 @@ def _fund_lof_code_id_map_em() -> dict:
     :return: LOF 代码和市场标识映射
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = "https://2.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
-        "pz": "5000",
+        "pz": "100",
         "po": "1",
         "np": "1",
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
         "fltt": "2",
         "invt": "2",
         "wbp2u": "|0|0|0|web",
-        "fid": "f3",
+        "fid": "f12",
         "fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407",
-        "fields": "f12,f13",
+        "fields": "f3,f12,f13",
         "_": "1672806290972",
     }
-    r = requests.get(url, params=params, timeout=60)
-    data_json = r.json()
-    temp_df = pd.DataFrame(data_json["data"]["diff"])
+    temp_df = fetch_paginated_data(url, params)
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))
     return temp_dict
 
@@ -173,7 +171,7 @@ def fund_lof_hist_em(
         "end": end_date,
         "_": "1623766962675",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, timeout=15, params=params)
     data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -234,7 +232,7 @@ def fund_lof_hist_min_em(
     if secid == "":
         for secid in [0, 1]:
             try:
-                print(secid, symbol)
+                # print(secid, symbol)
                 res = fund_lof_hist_min_em(symbol, period, adjust, secid)
                 break
             except:
@@ -253,10 +251,10 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "ndays": "5",
             "iscr": "0",
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "_": "1623766962675",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -295,12 +293,12 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "klt": period,
             "fqt": adjust_map[adjust],
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "beg": "0",
             "end": "20500000",
             "_": "1630930917857",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
