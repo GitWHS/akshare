@@ -16,9 +16,11 @@ import requests
 
 from akshare.utils.tqdm import get_tqdm
 
+from extra_utils import get_proxy
+
 
 def stock_individual_fund_flow(
-    stock: str = "600094", market: str = "sh"
+        stock: str = "600094", market: str = "sh"
 ) -> pd.DataFrame:
     """
     东方财富网-数据中心-资金流向-个股
@@ -45,7 +47,7 @@ def stock_individual_fund_flow(
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     json_data = r.json()
     content_list = json_data["data"]["klines"]
     temp_df = pd.DataFrame([item.split(",") for item in content_list])
@@ -139,7 +141,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         "fs": "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2",
         "fields": indicator_map[indicator][1],
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -150,7 +152,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15)
+        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)
@@ -355,9 +357,9 @@ def stock_market_fund_flow() -> pd.DataFrame:
         "cb": "jQuery183003743205523325188_1589197499471",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     text_data = r.text
-    json_data = json.loads(text_data[text_data.find("{") : -2])
+    json_data = json.loads(text_data[text_data.find("{"): -2])
     content_list = json_data["data"]["klines"]
     temp_df = pd.DataFrame([item.split(",") for item in content_list])
     temp_df.columns = [
@@ -415,7 +417,7 @@ def stock_market_fund_flow() -> pd.DataFrame:
 
 
 def stock_sector_fund_flow_rank(
-    indicator: str = "10日", sector_type: str = "行业资金流"
+        indicator: str = "10日", sector_type: str = "行业资金流"
 ) -> pd.DataFrame:
     """
     东方财富网-数据中心-资金流向-板块资金流-排名
@@ -465,7 +467,7 @@ def stock_sector_fund_flow_rank(
         "rt": "52975239",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -476,7 +478,7 @@ def stock_sector_fund_flow_rank(
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15)
+        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)
@@ -657,7 +659,7 @@ def _get_stock_sector_fund_flow_summary_code() -> dict:
         "rt": "52975239",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     name_code_map = dict(zip(temp_df["f14"], temp_df["f12"]))
@@ -665,7 +667,7 @@ def _get_stock_sector_fund_flow_summary_code() -> dict:
 
 
 def stock_sector_fund_flow_summary(
-    symbol: str = "电源设备", indicator: str = "今日"
+        symbol: str = "电源设备", indicator: str = "今日"
 ) -> pd.DataFrame:
     """
     东方财富网-数据中心-资金流向-行业资金流-xx行业个股资金流
@@ -691,7 +693,7 @@ def stock_sector_fund_flow_summary(
             "fs": f"b:{code_name_map[symbol]}",
             "fields": "f12,f14,f2,f3,f62,f184,f66,f69,f72,f75,f78,f81,f84,f87,f204,f205,f124,f1,f13",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_df.reset_index(inplace=True)
@@ -762,7 +764,7 @@ def stock_sector_fund_flow_summary(
             "fs": f"b:{code_name_map[symbol]}",
             "fields": "f12,f14,f2,f109,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f257,f258,f124,f1,f13",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_df.reset_index(inplace=True)
@@ -833,7 +835,7 @@ def stock_sector_fund_flow_summary(
             "fs": f"b:{code_name_map[symbol]}",
             "fields": "f12,f14,f2,f160,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f260,f261,f124,f1,f13",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_df.reset_index(inplace=True)
@@ -922,7 +924,7 @@ def stock_sector_fund_flow_hist(code: str = "电源设备") -> pd.DataFrame:
         "secid": f"90.{code}",
         "_": "1678954135116",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -994,7 +996,7 @@ def _get_stock_concept_fund_flow_summary_code() -> dict:
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     name_code_map = dict(zip(temp_df["f14"], temp_df["f12"]))
@@ -1019,7 +1021,7 @@ def stock_concept_fund_flow_hist(code: str = "锂电池") -> pd.DataFrame:
         "secid": f"90.{code}",
         "_": "1678954135116",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [

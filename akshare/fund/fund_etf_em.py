@@ -6,6 +6,8 @@ Desc: 东方财富-ETF行情
 https://quote.eastmoney.com/sh513500.html
 """
 
+import time
+
 from functools import lru_cache
 import math
 import pandas as pd
@@ -14,6 +16,7 @@ from akshare.utils.tqdm import get_tqdm
 
 from akshare.utils.func import fetch_paginated_data
 
+from extra_utils import get_proxy
 
 @lru_cache()
 def _fund_etf_code_id_map_em() -> dict:
@@ -36,7 +39,7 @@ def _fund_etf_code_id_map_em() -> dict:
         "fid": "f3",
         "fs": "b:MK0021,b:MK0022,b:MK0023,b:MK0024",
         "fields": "f3,f12,f13",
-        "_": "1672806290972",
+        "_": str(int(time.time()*1000)),
     }
     temp_df = fetch_paginated_data(url, params)
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))
@@ -261,17 +264,17 @@ def fund_etf_hist_em(
     try:
         market_id = code_id_dict[symbol]
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
     except KeyError:
         market_id = 1
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         if not data_json["data"]:
             market_id = 0
             params.update({"secid": f"{market_id}.{symbol}"})
-            r = requests.get(url, timeout=15, params=params)
+            r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
             data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -363,9 +366,9 @@ def fund_etf_hist_min_em(
             "ndays": "5",
             "iscr": "0",
             "secid": f"{secid}.{symbol}",
-            "_": "1623766962675",
+            "_": str(int(time.time()*1000)),
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -407,9 +410,9 @@ def fund_etf_hist_min_em(
             "secid": f"{secid}.{symbol}",
             "beg": "0",
             "end": "20500000",
-            "_": "1630930917857",
+            "_": str(int(time.time()*1000)),
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
@@ -493,6 +496,13 @@ if __name__ == "__main__":
     fund_etf_hist_min_em_df = fund_etf_hist_min_em(
         symbol="513560",
         period="5",
+        adjust="hfq",
+    )
+    print(fund_etf_hist_min_em_df)
+
+    fund_etf_hist_min_em_df = fund_etf_hist_min_em(
+        symbol="513560",
+        period="1",
         adjust="hfq",
     )
     print(fund_etf_hist_min_em_df)

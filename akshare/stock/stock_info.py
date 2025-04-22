@@ -13,7 +13,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-
+from extra_utils import get_proxy
 # @lru_cache()
 def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
     """
@@ -37,7 +37,7 @@ def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params, timeout=15)
+    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -150,7 +150,7 @@ def stock_info_sh_name_code(symbol: str = "主板A股") -> pd.DataFrame:
         "pageHelp.endPage": "1",
         "_": "1653291270045",
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["result"])
     col_stock_code = "B_STOCK_CODE" if symbol == "主板B股" else "A_STOCK_CODE"
@@ -195,14 +195,14 @@ def stock_info_bj_name_code() -> pd.DataFrame:
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
     }
-    r = requests.post(url, data=payload, headers=headers)
+    r = requests.post(url, data=payload, headers=headers, proxies=get_proxy(), verify=False)
     data_text = r.text
     data_json = json.loads(data_text[data_text.find("[") : -1])
     total_page = data_json[0]["totalPages"]
     big_df = pd.DataFrame()
     for page in tqdm(range(total_page), leave=False):
         payload.update({"page": page})
-        r = requests.post(url, data=payload, headers=headers)
+        r = requests.post(url, data=payload, headers=headers, proxies=get_proxy(), verify=False)
         data_text = r.text
         data_json = json.loads(data_text[data_text.find("[") : -1])
         temp_df = data_json[0]["content"]
@@ -310,7 +310,7 @@ def stock_info_sh_delist() -> pd.DataFrame:
         "pageHelp.endPage": "1",
         "_": "1643035608183",
     }
-    r = requests.get(url, params=params, headers=headers)
+    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["result"])
     temp_df.rename(
@@ -352,7 +352,7 @@ def stock_info_sz_delist(symbol: str = "暂停上市公司") -> pd.DataFrame:
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -381,7 +381,7 @@ def stock_info_sz_change_name(symbol: str = "全称变更") -> pd.DataFrame:
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -401,7 +401,7 @@ def stock_info_change_name(symbol: str = "000503") -> pd.DataFrame:
     :rtype: list
     """
     url = f"http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/{symbol}.phtml"
-    r = requests.get(url)
+    r = requests.get(url, proxies=get_proxy(), verify=False)
     temp_df = pd.read_html(r.text)[3].iloc[:, :2]
     temp_df.dropna(inplace=True)
     temp_df.columns = ["item", "value"]

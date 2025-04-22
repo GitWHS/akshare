@@ -10,6 +10,7 @@ import requests
 
 from akshare.stock_feature.stock_hist_em import code_id_map_em
 
+from extra_utils import get_proxy
 
 def stock_individual_info_em(symbol: str = "603777", timeout: float = None) -> pd.DataFrame:
     """
@@ -38,7 +39,7 @@ def stock_individual_info_em(symbol: str = "603777", timeout: float = None) -> p
             "secid": f"{code_id}.{symbol}",
             "_": "1640157544804",
         }
-        r = requests.get(url, params=params, timeout=timeout)
+        r = requests.get(url, params=params, timeout=timeout, proxies=get_proxy())
         data_json = r.json()
         if data_json.get("data"):
             target_data_json = data_json

@@ -12,6 +12,8 @@ import requests
 
 from akshare.utils.tqdm import get_tqdm
 
+from extra_utils import get_proxy
+
 
 def fetch_paginated_data(url: str, base_params: Dict, timeout: int = 15):
     """
@@ -29,7 +31,7 @@ def fetch_paginated_data(url: str, base_params: Dict, timeout: int = 15):
     # 复制参数以避免修改原始参数
     params = base_params.copy()
     # 获取第一页数据，用于确定分页信息
-    r = requests.get(url, params=params, timeout=timeout)
+    r = requests.get(url, params=params, timeout=timeout, proxies=get_proxy(), verify=False)
     data_json = r.json()
     # 计算分页信息
     per_page_num = len(data_json["data"]["diff"])

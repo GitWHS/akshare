@@ -10,6 +10,7 @@ from functools import lru_cache
 import pandas as pd
 import requests
 
+from extra_utils import get_proxy
 
 def stock_zh_a_spot_em() -> pd.DataFrame:
     """
@@ -1098,7 +1099,7 @@ def stock_zh_a_hist_min_em(
             "secid": f"{market_code}.{symbol}",
             "_": "1623766962675",
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]

@@ -18,6 +18,8 @@ import requests
 from akshare.utils import demjson
 
 
+from extra_utils import get_proxy
+
 def fund_purchase_em() -> pd.DataFrame:
     """
     东方财富网站-天天基金网-基金数据-基金申购状态
@@ -343,7 +345,7 @@ def fund_open_fund_info_em(
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
     }
-    r = requests.get(url, headers=headers)
+    r = requests.get(url, headers=headers, proxies=get_proxy(), verify=False)
     data_text = r.text
 
     # 单位净值走势

@@ -8,6 +8,8 @@ https://quote.eastmoney.com/center/boardlist.html#concept_board
 import requests
 import pandas as pd
 
+from extra_utils import get_proxy
+
 
 def stock_board_concept_name_em() -> pd.DataFrame:
     """
@@ -30,7 +32,7 @@ def stock_board_concept_name_em() -> pd.DataFrame:
         "fields": "f2,f3,f4,f8,f12,f14,f15,f16,f17,f18,f20,f21,f24,f25,f22,f33,f11,f62,f128,f124,f107,f104,f105,f136",
         "_": "1626075887768",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     temp_df.reset_index(inplace=True)
@@ -92,11 +94,11 @@ def stock_board_concept_name_em() -> pd.DataFrame:
 
 
 def stock_board_concept_hist_em(
-    symbol: str = "数字货币",
-    period: str = "daily",
-    start_date: str = "20220101",
-    end_date: str = "20221128",
-    adjust: str = "",
+        symbol: str = "数字货币",
+        period: str = "daily",
+        start_date: str = "20220101",
+        end_date: str = "20221128",
+        adjust: str = "",
 ) -> pd.DataFrame:
     """
     东方财富网-沪深板块-概念板块-历史行情
@@ -122,7 +124,7 @@ def stock_board_concept_hist_em(
     stock_board_concept_em_map = stock_board_concept_name_em()
     stock_board_code = stock_board_concept_em_map[
         stock_board_concept_em_map["板块名称"] == symbol
-    ]["板块代码"].values[0]
+        ]["板块代码"].values[0]
     adjust_map = {"": "0", "qfq": "1", "hfq": "2"}
     url = "http://91.push2his.eastmoney.com/api/qt/stock/kline/get"
     params = {
@@ -138,7 +140,7 @@ def stock_board_concept_hist_em(
         "lmt": "1000000",
         "_": "1626079488673",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -183,7 +185,7 @@ def stock_board_concept_hist_em(
 
 
 def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
-) -> pd.DataFrame:
+                                    ) -> pd.DataFrame:
     """
     东方财富网-沪深板块-概念板块-分时历史行情
     https://quote.eastmoney.com/bk/90.BK0715.html
@@ -206,7 +208,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "secid": f"90.{stock_board_code}",
             "_": "1687852931312",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -247,7 +249,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "lmt": "1000000",
             "_": "1647760607065",
         }
-        r = requests.get(url, params=params)
+        r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
         temp_df.columns = [
@@ -315,7 +317,7 @@ def stock_board_concept_cons_em(stock_board_code: str = "车联网") -> pd.DataF
         "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f45",
         "_": "1626081702127",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
 
     temp_df = pd.DataFrame(data_json["data"]["diff"])
