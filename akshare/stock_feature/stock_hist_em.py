@@ -923,7 +923,7 @@ def code_id_map_em() -> dict:
     :return: 股票和市场代码
     :rtype: dict
     """
-    url = "https://80.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "50000",
@@ -935,7 +935,6 @@ def code_id_map_em() -> dict:
         "fid": "f3",
         "fs": "m:1 t:2,m:1 t:23",
         "fields": "f12",
-        "_": "1623833739532",
     }
     r = requests.get(url, params=params, timeout=15)
     data_json = r.json()
@@ -956,9 +955,8 @@ def code_id_map_em() -> dict:
         "fid": "f3",
         "fs": "m:0 t:6,m:0 t:80",
         "fields": "f12",
-        "_": "1623833739532",
     }
-    r = requests.get(url, params=params, timeout=15)
+    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
     data_json = r.json()
     if not data_json["data"]["diff"]:
         return dict()
@@ -975,10 +973,9 @@ def code_id_map_em() -> dict:
         "invt": "2",
         "fid": "f3",
         "fs": "m:0 t:81 s:2048",
-        "fields": "f12",
-        "_": "1623833739532",
+        "fields": "f12"
     }
-    r = requests.get(url, params=params, timeout=15)
+    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
     data_json = r.json()
     if not data_json["data"]["diff"]:
         return dict()
@@ -1097,7 +1094,6 @@ def stock_zh_a_hist_min_em(
             "ndays": "5",
             "iscr": "0",
             "secid": f"{market_code}.{symbol}",
-            "_": "1623766962675",
         }
         r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
@@ -1141,7 +1137,6 @@ def stock_zh_a_hist_min_em(
             "secid": f"{market_code}.{symbol}",
             "beg": "0",
             "end": "20500000",
-            "_": "1630930917857",
         }
         r = requests.get(url, timeout=15, params=params)
         data_json = r.json()
@@ -1215,14 +1210,12 @@ def stock_zh_a_hist_pre_min_em(
     params = {
         "fields1": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13",
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58",
-        "ut": "fa5fd1943c7b386f172d6893dbfba10b",
         "ndays": "1",
         "iscr": "1",
         "iscca": "0",
         "secid": f"{code_id_dict[symbol]}.{symbol}",
-        "_": "1623766962675",
     }
-    r = requests.get(url, params=params)
+    r = requests.get(url, timeout=15, params=params)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["trends"]])
     temp_df.columns = [

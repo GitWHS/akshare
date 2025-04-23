@@ -4,17 +4,20 @@
 Date: 2023/2/19 19:00
 Desc: 股票基本信息
 """
+
 import json
 import warnings
 from functools import lru_cache
 from io import BytesIO
+from io import StringIO
 
 import pandas as pd
 import requests
 from tqdm import tqdm
 
 from extra_utils import get_proxy
-# @lru_cache()
+
+@lru_cache()
 def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
     """
     深圳证券交易所-股票列表
@@ -24,7 +27,7 @@ def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
     :return: 指定 indicator 的数据
     :rtype: pandas.DataFrame
     """
-    url = "http://www.szse.cn/api/report/ShowReport"
+    url = "https://www.szse.cn/api/report/ShowReport"
     indicator_map = {
         "A股列表": "tab1",
         "B股列表": "tab2",
@@ -37,7 +40,7 @@ def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -116,23 +119,24 @@ def stock_info_sz_name_code(symbol: str = "A股列表") -> pd.DataFrame:
         return temp_df
 
 
-# @lru_cache()
+@lru_cache()
 def stock_info_sh_name_code(symbol: str = "主板A股") -> pd.DataFrame:
     """
     上海证券交易所-股票列表
-    http://www.sse.com.cn/assortment/stock/list/share/
+    https://www.sse.com.cn/assortment/stock/list/share/
     :param symbol: choice of {"主板A股": "1", "主板B股": "2", "科创板": "8"}
     :type symbol: str
     :return: 指定 indicator 的数据
     :rtype: pandas.DataFrame
     """
     indicator_map = {"主板A股": "1", "主板B股": "2", "科创板": "8"}
-    url = "http://query.sse.com.cn/sseQuery/commonQuery.do"
+    url = "https://query.sse.com.cn/sseQuery/commonQuery.do"
     headers = {
         "Host": "query.sse.com.cn",
         "Pragma": "no-cache",
-        "Referer": "http://www.sse.com.cn/assortment/stock/list/share/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
+        "Referer": "https://www.sse.com.cn/assortment/stock/list/share/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/81.0.4044.138 Safari/537.36",
     }
     params = {
         "STOCK_TYPE": indicator_map[symbol],
@@ -148,9 +152,8 @@ def stock_info_sh_name_code(symbol: str = "主板A股") -> pd.DataFrame:
         "pageHelp.pageSize": "10000",
         "pageHelp.pageNo": "1",
         "pageHelp.endPage": "1",
-        "_": "1653291270045",
     }
-    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=headers)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["result"])
     col_stock_code = "B_STOCK_CODE" if symbol == "主板B股" else "A_STOCK_CODE"
@@ -175,7 +178,7 @@ def stock_info_sh_name_code(symbol: str = "主板A股") -> pd.DataFrame:
     return temp_df
 
 
-# @lru_cache()
+@lru_cache()
 def stock_info_bj_name_code() -> pd.DataFrame:
     """
     北京证券交易所-股票列表
@@ -193,16 +196,17 @@ def stock_info_bj_name_code() -> pd.DataFrame:
         "sorttype": "asc",
     }
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/110.0.0.0 Safari/537.36"
     }
-    r = requests.post(url, data=payload, headers=headers, proxies=get_proxy(), verify=False)
+    r = requests.post(url, data=payload, headers=headers)
     data_text = r.text
     data_json = json.loads(data_text[data_text.find("[") : -1])
     total_page = data_json[0]["totalPages"]
     big_df = pd.DataFrame()
     for page in tqdm(range(total_page), leave=False):
         payload.update({"page": page})
-        r = requests.post(url, data=payload, headers=headers, proxies=get_proxy(), verify=False)
+        r = requests.post(url, data=payload, headers=headers, timeout=15, proxies=get_proxy(), verify=False)
         data_text = r.text
         data_json = json.loads(data_text[data_text.find("[") : -1])
         temp_df = data_json[0]["content"]
@@ -275,14 +279,21 @@ def stock_info_bj_name_code() -> pd.DataFrame:
     return big_df
 
 
-def stock_info_sh_delist() -> pd.DataFrame:
+def stock_info_sh_delist(symbol: str = "全部") -> pd.DataFrame:
     """
     上海证券交易所-终止上市公司
-    http://www.sse.com.cn/assortment/stock/list/delisting/
+    https://www.sse.com.cn/assortment/stock/list/delisting/
+    :param symbol: choice of {"全部", "沪市", "科创板"}
+    :type symbol: str
     :return: 终止上市公司
     :rtype: pandas.DataFrame
     """
-    url = "http://query.sse.com.cn/commonQuery.do"
+    symbol_map = {
+        "全部": "1,2,8",
+        "沪市": "1,2",
+        "科创板": "8",
+    }
+    url = "https://query.sse.com.cn/commonQuery.do"
     headers = {
         "Accept": "*/*",
         "Accept-Encoding": "gzip, deflate",
@@ -291,8 +302,9 @@ def stock_info_sh_delist() -> pd.DataFrame:
         "Connection": "keep-alive",
         "Host": "query.sse.com.cn",
         "Pragma": "no-cache",
-        "Referer": "http://www.sse.com.cn/",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36",
+        "Referer": "https://www.sse.com.cn/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/97.0.4692.71 Safari/537.36",
     }
     params = {
         "sqlId": "COMMON_SSE_CP_GPJCTPZ_GPLB_GP_L",
@@ -300,7 +312,7 @@ def stock_info_sh_delist() -> pd.DataFrame:
         "STOCK_CODE": "",
         "CSRC_CODE": "",
         "REG_PROVINCE": "",
-        "STOCK_TYPE": "1,2",
+        "STOCK_TYPE": symbol_map[symbol],
         "COMPANY_STATUS": "3",
         "type": "inParams",
         "pageHelp.cacheSize": "1",
@@ -308,9 +320,8 @@ def stock_info_sh_delist() -> pd.DataFrame:
         "pageHelp.pageSize": "500",
         "pageHelp.pageNo": "1",
         "pageHelp.endPage": "1",
-        "_": "1643035608183",
     }
-    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=headers)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["result"])
     temp_df.rename(
@@ -330,29 +341,31 @@ def stock_info_sh_delist() -> pd.DataFrame:
             "暂停上市日期",
         ]
     ]
-    temp_df["上市日期"] = pd.to_datetime(temp_df["上市日期"]).dt.date
-    temp_df["暂停上市日期"] = pd.to_datetime(temp_df["暂停上市日期"]).dt.date
+    temp_df["上市日期"] = pd.to_datetime(temp_df["上市日期"], errors="coerce").dt.date
+    temp_df["暂停上市日期"] = pd.to_datetime(
+        temp_df["暂停上市日期"], errors="coerce"
+    ).dt.date
     return temp_df
 
 
 def stock_info_sz_delist(symbol: str = "暂停上市公司") -> pd.DataFrame:
     """
     深证证券交易所-暂停上市公司-终止上市公司
-    http://www.szse.cn/market/stock/suspend/index.html
+    https://www.szse.cn/market/stock/suspend/index.html
     :param symbol: choice of {"暂停上市公司", "终止上市公司"}
     :type symbol: str
     :return: 暂停上市公司 or 终止上市公司 的数据
     :rtype: pandas.DataFrame
     """
     indicator_map = {"暂停上市公司": "tab1", "终止上市公司": "tab2"}
-    url = "http://www.szse.cn/api/report/ShowReport"
+    url = "https://www.szse.cn/api/report/ShowReport"
     params = {
         "SHOWTYPE": "xlsx",
         "CATALOGID": "1793_ssgs",
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -367,21 +380,21 @@ def stock_info_sz_delist(symbol: str = "暂停上市公司") -> pd.DataFrame:
 def stock_info_sz_change_name(symbol: str = "全称变更") -> pd.DataFrame:
     """
     深证证券交易所-市场数据-股票数据-名称变更
-    http://www.szse.cn/www/market/stock/changename/index.html
+    https://www.szse.cn/www/market/stock/changename/index.html
     :param symbol: choice of {"全称变更": "tab1", "简称变更": "tab2"}
     :type symbol: str
     :return: 名称变更数据
     :rtype: pandas.DataFrame
     """
     indicator_map = {"全称变更": "tab1", "简称变更": "tab2"}
-    url = "http://www.szse.cn/api/report/ShowReport"
+    url = "https://www.szse.cn/api/report/ShowReport"
     params = {
         "SHOWTYPE": "xlsx",
         "CATALOGID": "SSGSGMXX",
         "TABKEY": indicator_map[symbol],
         "random": "0.6935816432433362",
     }
-    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params)
     with warnings.catch_warnings(record=True):
         warnings.simplefilter("always")
         temp_df = pd.read_excel(BytesIO(r.content))
@@ -394,26 +407,28 @@ def stock_info_sz_change_name(symbol: str = "全称变更") -> pd.DataFrame:
 def stock_info_change_name(symbol: str = "000503") -> pd.DataFrame:
     """
     新浪财经-股票曾用名
-    http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/300378.phtml
+    https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/300378.phtml
     :param symbol: 股票代码
     :type symbol: str
     :return: 股票曾用名
     :rtype: list
     """
-    url = f"http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/{symbol}.phtml"
-    r = requests.get(url, proxies=get_proxy(), verify=False)
-    temp_df = pd.read_html(r.text)[3].iloc[:, :2]
+    url = f"https://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/{symbol}.phtml"
+    r = requests.get(url)
+    temp_df = pd.read_html(StringIO(r.text))[3].iloc[:, :2]
     temp_df.dropna(inplace=True)
     temp_df.columns = ["item", "value"]
     temp_df["item"] = temp_df["item"].str.split("：", expand=True)[0]
     try:
-        name_list = temp_df[temp_df["item"] == "证券简称更名历史"].value.tolist()[0].split(" ")
+        name_list = (
+            temp_df[temp_df["item"] == "证券简称更名历史"].value.tolist()[0].split(" ")
+        )
         big_df = pd.DataFrame(name_list)
         big_df.reset_index(inplace=True)
         big_df["index"] = big_df.index + 1
         big_df.columns = ["index", "name"]
         return big_df
-    except IndexError as e:
+    except IndexError:
         return pd.DataFrame()
 
 

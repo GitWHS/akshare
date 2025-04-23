@@ -7,6 +7,7 @@ https://so.eastmoney.com/news/s?keyword=%E4%B8%AD%E5%9B%BD%E4%BA%BA%E5%AF%BF&pag
 """
 
 import json
+import time
 
 import pandas as pd
 import requests
@@ -124,14 +125,14 @@ def stock_news_list_info(code, code_type) -> pd.DataFrame:
     for secid in secid_list:
         try:
             url = "https://np-listapi.eastmoney.com/comm/web/getListInfo"
+            callback = f"jQuery35107504809342017689_{int(time.time()*1000)}"
             params = {
                 "cfh": "1",
                 "client": "web",
                 "mTypeAndCode": f"{secid}.{code}",
                 "type": "1",
                 "pageSize": "200",
-                "callback": "jQuery35107504809342017689_1722167990793",
-                "_":"1722167990794"
+                "callback": callback,
             }
             # proxies = {
             #     "http": "http://192.168.1.3:55930",
@@ -140,7 +141,7 @@ def stock_news_list_info(code, code_type) -> pd.DataFrame:
             r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
             data_text = r.text
             data_json = json.loads(
-                data_text.strip("jQuery35107504809342017689_1722167990793(")[:-1]
+                data_text.strip(callback+"(")[:-1]
             )
             temp_df = pd.DataFrame(data_json["data"]["list"])
             temp_df.rename(

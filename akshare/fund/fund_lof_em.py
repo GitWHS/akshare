@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-Date: 2023/7/3 20:18
+Date: 2025/3/11 17:00
 Desc: 东方财富-LOF 行情
 https://quote.eastmoney.com/center/gridlist.html#fund_lof
 https://quote.eastmoney.com/sz166009.html
@@ -37,7 +37,6 @@ def _fund_lof_code_id_map_em() -> dict:
         "fid": "f12",
         "fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407",
         "fields": "f3,f12,f13",
-        "_": "1672806290972",
     }
     temp_df = fetch_paginated_data(url, params)
     temp_dict = dict(zip(temp_df["f12"], temp_df["f13"]))
@@ -65,7 +64,6 @@ def fund_lof_spot_em() -> pd.DataFrame:
         "fs": "b:MK0404,b:MK0405,b:MK0406,b:MK0407",
         "fields": "f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f12,f13,f14,"
         "f15,f16,f17,f18,f20,f21,f23,f24,f25,f22,f11,f62,f128,f136,f115,f152,f297,f124",
-        "_": "1672806290972",
     }
     temp_df = fetch_paginated_data(url, params)
     temp_df.rename(
@@ -130,7 +128,6 @@ def fund_lof_spot_em() -> pd.DataFrame:
         .dt.tz_convert("Asia/Shanghai")
     )
 
-
     return temp_df
 
 
@@ -170,7 +167,6 @@ def fund_lof_hist_em(
         "secid": f"{code_id_dict[symbol]}.{symbol}",
         "beg": start_date,
         "end": end_date,
-        "_": "1623766962675",
     }
     r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
     data_json = r.json()
@@ -227,18 +223,7 @@ def fund_lof_hist_min_em(
     :return: 每日分时行情
     :rtype: pandas.DataFrame
     """
-    if secid == "":
-        code_id_dict = _fund_lof_code_id_map_em()
-        secid = code_id_dict.get(symbol, "")
-    if secid == "":
-        for secid in [0, 1]:
-            try:
-                # print(secid, symbol)
-                res = fund_lof_hist_min_em(symbol, period, adjust, secid)
-                break
-            except:
-                pass
-        return res
+    code_id_dict = _fund_lof_code_id_map_em()
     adjust_map = {
         "": "0",
         "qfq": "1",
@@ -252,8 +237,7 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "ndays": "5",
             "iscr": "0",
-            "secid": f"{secid}.{symbol}",
-            "_": "1623766962675",
+            "secid": f"{code_id_dict[symbol]}.{symbol}",
         }
         r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
@@ -294,10 +278,9 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "klt": period,
             "fqt": adjust_map[adjust],
-            "secid": f"{secid}.{symbol}",
+            "secid": f"{code_id_dict[symbol]}.{symbol}",
             "beg": "0",
             "end": "20500000",
-            "_": "1630930917857",
         }
         r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
         data_json = r.json()
@@ -350,8 +333,8 @@ def fund_lof_hist_min_em(
 
 
 if __name__ == "__main__":
-    # fund_lof_spot_em_df = fund_lof_spot_em()
-    # print(fund_lof_spot_em_df)
+    fund_lof_spot_em_df = fund_lof_spot_em()
+    print(fund_lof_spot_em_df)
     #
     # fund_lof_hist_em_df = fund_lof_hist_em(
     #     symbol="166009",
