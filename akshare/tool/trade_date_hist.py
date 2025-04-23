@@ -7,13 +7,14 @@ https://finance.sina.com.cn/realstock/company/klc_td_sh.txt
 此处可以用来更新 calendar.json 文件，注意末尾没有 "," 号
 """
 import datetime
+import traceback
 
 import pandas as pd
 import requests
 from py_mini_racer import py_mini_racer
 
 from akshare.stock.cons import hk_js_decode
-
+from extra_utils import get_proxy
 
 def tool_trade_date_hist_sina() -> pd.DataFrame:
     """
@@ -23,7 +24,14 @@ def tool_trade_date_hist_sina() -> pd.DataFrame:
     :rtype: pandas.DataFrame
     """
     url = "https://finance.sina.com.cn/realstock/company/klc_td_sh.txt"
-    r = requests.get(url, timeout=60)
+    proxy = None
+    for i in range(3):
+        try:
+            r = requests.get(url, timeout=15, proxies=proxy, verify=False)
+            break
+        except:
+            traceback.print_exc()
+            proxy = get_proxy()
     js_code = py_mini_racer.MiniRacer()
     js_code.eval(hk_js_decode)
     dict_list = js_code.call("d", r.text.split("=")[1].split(";")[0].replace('"', ""))

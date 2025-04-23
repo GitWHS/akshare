@@ -141,7 +141,8 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         "fs": "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2",
         "fields": indicator_map[indicator][1],
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    proxy = get_proxy()
+    r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -152,7 +153,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)
@@ -486,7 +487,8 @@ def stock_sector_fund_flow_rank(
         "rt": "52975239",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers, timeout=15, proxies=get_proxy(), verify=False)
+    proxy = get_proxy()
+    r = requests.get(url, params=params, headers=headers, timeout=15, proxies=proxy, verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -497,7 +499,7 @@ def stock_sector_fund_flow_rank(
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)

@@ -959,14 +959,15 @@ def fund_etf_fund_info_em(
         "endDate": "-".join([end_date[:4], end_date[4:6], end_date[6:]]),
         "_": round(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers)
+    proxy = get_proxy()
+    r = requests.get(url, params=params, headers=headers, timeout=15, proxies=proxy, verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["TotalCount"] / 20)
     df_list = []
     tqdm = get_tqdm()
     for page in tqdm(range(1, total_page + 1), leave=False):
         params.update({"pageIndex": page})
-        r = requests.get(url, params=params, headers=headers)
+        r = requests.get(url, params=params, headers=headers, timeout=15, proxies=proxy, verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json["Data"]["LSJZList"])
         df_list.append(temp_df)

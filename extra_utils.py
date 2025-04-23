@@ -15,13 +15,16 @@ def get_proxy():
     try:
         # 发送请求到指定接口
         host = host_list[0]
-        url = f"http://{host}:52001/get/"
+        url = f"http://{host}:52001/get/?http_only=false"
         response = requests.get(url)
         # 检查响应状态码
         if response.status_code == 200:
-            # 尝试解析响应的 JSON 数据
             proxy_data = response.json()
-            # 假设接口返回的代理数据有一个字段表示代理，这里简单示例为 'proxy'
+            if not proxy_data:
+                url = f"http://{host}:52001/get/?http_only=true"
+                response = requests.get(url)
+                proxy_data = response.json()
+
             if proxy_data:
                 proxy_list = proxy_data[0]['m_ip']
                 proxy_json = {
@@ -30,7 +33,7 @@ def get_proxy():
                 }
                 print(f"{formatted_time} 取得代理：{proxy_list}")
             else:
-                print(f"{formatted_time}无法取得代理")
+                print(f"{formatted_time} 无法取得代理")
                 proxy_json = None
             return proxy_json
         else:
