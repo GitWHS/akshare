@@ -8,7 +8,6 @@ host_list = ["192.168.1.8", "192.168.1.11"]
 
 
 def get_proxy():
-    # 获取当前时间戳（从 1970 年 1 月 1 日 00:00:00 UTC 到现在的秒数）
     timestamp = time.time()
     local_time = time.localtime(timestamp)
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", local_time)
@@ -27,11 +26,17 @@ def get_proxy():
 
             if proxy_data:
                 proxy_list = proxy_data[0]['m_ip']
+                user = proxy_data[0].get("user")
+                pwd = proxy_data[0].get("pwd")
+                if user and pwd:
+                    proxy_url = f"http://{user}:{pwd}@{proxy_list[0]}:{proxy_list[1]}"
+                else:
+                    proxy_url = f"http://{proxy_list[0]}:{proxy_list[1]}"
                 proxy_json = {
-                    "http": f"http://{proxy_list[0]}:{proxy_list[1]}",
-                    "https": f"http://{proxy_list[0]}:{proxy_list[1]}",
+                    "http": proxy_url,
+                    "https": proxy_url,
                 }
-                print(f"{formatted_time} 取得代理：{proxy_list}")
+                print(f"{formatted_time} 取得代理：{proxy_url}")
             else:
                 print(f"{formatted_time} 无法取得代理")
                 proxy_json = None
@@ -45,6 +50,76 @@ def get_proxy():
     host_bak = host_list.pop(0)
     host_list.append(host_bak)
     return None
+
+
+
+import random
+def get_headers():
+    user_agent_pool = [
+        # Firefox
+        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.71',
+        'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; QQDownload 732; .NET4.0C; .NET4.0E)',
+        'Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.1) Gecko/20061208 Firefox/2.0.0 Opera 9.50',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0',
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Mozilla/5.0 (Linux; Android 10; Pixel_3ULD) AppleWebKit/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15",
+        "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/113.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0",
+        "Mozilla/5.0 (Linux Android 11; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0 Safari/537.36",
+
+        # Chrome
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Linux x86_64; Android 12; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 16_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Mobile/15E148 Safari/604.1",
+
+        # Edge
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36 Edg/120.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0",
+        "Mozilla/5.0 (Linux x86_64; Android 12; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36 Edg/118.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36 Edg/117.0",
+
+        # Safari
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 16_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.4 Mobile/15E148 Safari/604.1",
+
+        # Opera
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36 OPR/95.0",
+
+        # Internet Explorer
+        "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko",
+        "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1)",
+
+        # Chrome for Android
+        "Mozilla/5.0 (Linux; Android 12; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0 Safari/537.36",
+
+        # Firefox for Android
+        "Mozilla/5.0 (Linux; Android 12; Mobile) Gecko/20100101 Firefox/113.0",
+
+        "ozilla/3.75 (compatible; Netscape 4.0)",
+        "Dalvik/2.1.0 (Linux; Android 9)",
+        "iPhone OS 14_7_1 (18G89) AppleWebKit/605.1.15",
+        "iPadOS 15.2.1 (16F214) AppleWebKit/605.1.15",
+    ]
+
+    v = random.randint(100, 120)
+    default_headers = {
+        # "Accept": '*/*',
+        # "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{v}.0.0.0 Safari/537.36"
+    }
+
+    return default_headers
 
 
 if __name__ == "__main__":

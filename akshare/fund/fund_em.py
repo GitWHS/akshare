@@ -28,7 +28,7 @@ from akshare.utils import demjson
 from akshare.utils.cons import headers
 from akshare.utils.tqdm import get_tqdm
 
-from extra_utils import get_proxy
+import extra_utils
 
 def fund_purchase_em() -> pd.DataFrame:
     """
@@ -351,7 +351,7 @@ def fund_open_fund_info_em(
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
     }
-    r = requests.get(url, headers=headers, proxies=get_proxy(), verify=False)
+    r = requests.get(url, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_text = r.text
 
     # 单位净值走势
@@ -959,7 +959,7 @@ def fund_etf_fund_info_em(
         "endDate": "-".join([end_date[:4], end_date[4:6], end_date[6:]]),
         "_": round(time.time() * 1000),
     }
-    proxy = get_proxy()
+    proxy = extra_utils.get_proxy()
     r = requests.get(url, params=params, headers=headers, timeout=15, proxies=proxy, verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["TotalCount"] / 20)

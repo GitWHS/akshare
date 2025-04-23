@@ -16,7 +16,7 @@ import requests
 from akshare.utils.func import fetch_paginated_data
 from akshare.utils.tqdm import get_tqdm
 
-from extra_utils import get_proxy
+import extra_utils
 
 
 def stock_individual_fund_flow(
@@ -34,20 +34,16 @@ def stock_individual_fund_flow(
     """
     market_map = {"sh": 1, "sz": 0, "bj": 0}
     url = "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-    }
     params = {
         "lmt": "0",
         "klt": "101",
         "secid": f"{market_map[market]}.{stock}",
         "fields1": "f1,f2,f3,f7",
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     json_data = r.json()
     content_list = json_data["data"]["klines"]
     temp_df = pd.DataFrame([item.split(",") for item in content_list])
@@ -137,12 +133,11 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         "np": "1",
         "fltt": "2",
         "invt": "2",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "fs": "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2",
         "fields": indicator_map[indicator][1],
     }
-    proxy = get_proxy()
-    r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers, proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -153,7 +148,12 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
+        for i in range(5):
+            try:
+                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+                break
+            except Exception as e:
+                print(f"{url} get error {e}")
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)
@@ -355,7 +355,7 @@ def stock_market_fund_flow() -> pd.DataFrame:
         "secid2": "0.399001",
         "fields1": "f1,f2,f3,f7",
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "_": int(time.time() * 1000),
     }
     r = requests.get(url, params=params, headers=headers)
@@ -468,27 +468,20 @@ def stock_sector_fund_flow_rank(
         ],
     }
     url = "https://push2.eastmoney.com/api/qt/clist/get"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-    }
     params = {
         "pn": "1",
         "pz": "100",
         "po": "1",
         "np": "1",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "fltt": "2",
         "invt": "2",
         "fid0": indicator_map[indicator][0],
         "fs": f"m:90 t:{sector_type_map[sector_type]}",
         "stat": indicator_map[indicator][1],
         "fields": indicator_map[indicator][2],
-        "rt": "52975239",
-        "_": int(time.time() * 1000),
     }
-    proxy = get_proxy()
-    r = requests.get(url, params=params, headers=headers, timeout=15, proxies=proxy, verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -499,7 +492,12 @@ def stock_sector_fund_flow_rank(
                 "pn": page,
             }
         )
-        r = requests.get(url, params=params, timeout=15, proxies=proxy, verify=False)
+        for i in range(5):
+            try:
+                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+                break
+            except Exception as e:
+                print(f"{url} get error {e}")
         data_json = r.json()
         inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
         temp_list.append(inner_temp_df)
@@ -667,7 +665,7 @@ def _get_stock_sector_fund_flow_summary_code() -> dict:
         "pz": "100",
         "po": "1",
         "np": "1",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "fltt": "2",
         "invt": "2",
         "fid0": "f62",
@@ -985,7 +983,7 @@ def stock_sector_fund_flow_hist(code: str = "电源设备") -> pd.DataFrame:
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
         "secid": f"90.{code}",
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -1043,9 +1041,6 @@ def _get_stock_concept_fund_flow_summary_code() -> dict:
     :rtype: dict
     """
     url = "https://push2.eastmoney.com/api/qt/clist/get"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36",
-    }
     params = {
         "pn": "1",
         "pz": "5000",
@@ -1054,10 +1049,10 @@ def _get_stock_concept_fund_flow_summary_code() -> dict:
         "fields": "f12,f13,f14,f62",
         "fid": "f62",
         "fs": "m:90+t:3",
-        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=headers, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     name_code_map = dict(zip(temp_df["f14"], temp_df["f12"]))
@@ -1081,7 +1076,7 @@ def stock_concept_fund_flow_hist(code: str = "锂电池") -> pd.DataFrame:
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
         "secid": f"90.{code}",
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -1136,8 +1131,8 @@ if __name__ == "__main__":
     )
     print(stock_individual_fund_flow_df)
     #
-    # stock_individual_fund_flow_rank_df = stock_individual_fund_flow_rank(indicator="今日")
-    # print(stock_individual_fund_flow_rank_df)
+    stock_individual_fund_flow_rank_df = stock_individual_fund_flow_rank(indicator="今日")
+    print(stock_individual_fund_flow_rank_df)
     #
     # stock_individual_fund_flow_rank_df = stock_individual_fund_flow_rank(indicator="3日")
     # print(stock_individual_fund_flow_rank_df)

@@ -14,7 +14,7 @@ import requests
 
 from akshare.utils.func import fetch_paginated_data
 
-from extra_utils import get_proxy
+import extra_utils
 
 
 @lru_cache()
@@ -267,7 +267,7 @@ def stock_board_concept_hist_em(
         "smplmt": "10000",
         "lmt": "1000000",
     }
-    r = requests.get(url, params=params, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -333,7 +333,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "ndays": '1',
             "secid": f"90.{stock_board_code}",
         }
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -372,7 +372,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "end": "20500101",
             "lmt": "1000000",
         }
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

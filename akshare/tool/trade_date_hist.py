@@ -14,7 +14,7 @@ import requests
 from py_mini_racer import py_mini_racer
 
 from akshare.stock.cons import hk_js_decode
-from extra_utils import get_proxy
+import extra_utils
 
 def tool_trade_date_hist_sina() -> pd.DataFrame:
     """
@@ -27,11 +27,13 @@ def tool_trade_date_hist_sina() -> pd.DataFrame:
     proxy = None
     for i in range(3):
         try:
-            r = requests.get(url, timeout=15, proxies=proxy, verify=False)
+            headers = extra_utils.get_headers()
+            headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+            r = requests.get(url, timeout=15, headers=headers, proxies=proxy, verify=False)
             break
         except:
             traceback.print_exc()
-            proxy = get_proxy()
+            proxy = extra_utils.get_proxy()
     js_code = py_mini_racer.MiniRacer()
     js_code.eval(hk_js_decode)
     dict_list = js_code.call("d", r.text.split("=")[1].split(";")[0].replace('"', ""))

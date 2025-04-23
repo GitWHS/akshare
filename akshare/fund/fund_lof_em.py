@@ -14,7 +14,7 @@ import requests
 
 from akshare.utils.func import fetch_paginated_data
 
-from extra_utils import get_proxy
+import extra_utils
 
 @lru_cache()
 def _fund_lof_code_id_map_em() -> dict:
@@ -168,7 +168,7 @@ def fund_lof_hist_em(
         "beg": start_date,
         "end": end_date,
     }
-    r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
+    r = requests.get(url, timeout=15, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -239,7 +239,7 @@ def fund_lof_hist_min_em(
             "iscr": "0",
             "secid": f"{code_id_dict[symbol]}.{symbol}",
         }
-        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
+        r = requests.get(url, timeout=15, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -282,7 +282,7 @@ def fund_lof_hist_min_em(
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
+        r = requests.get(url, timeout=15, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

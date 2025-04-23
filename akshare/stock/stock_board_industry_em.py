@@ -14,7 +14,7 @@ import requests
 
 from akshare.utils.func import fetch_paginated_data
 
-from extra_utils import get_proxy
+import extra_utils
 
 
 @lru_cache()
@@ -243,7 +243,7 @@ def stock_board_industry_spot_em(symbol: str = "小金属") -> pd.DataFrame:
         fltt="1",
         secid=f"90.{em_code}",
     )
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_dict = r.json()
     result = pd.DataFrame.from_dict(data_dict["data"], orient="index")
     result.rename(field_map, inplace=True)
@@ -304,7 +304,7 @@ def stock_board_industry_hist_em(
         "smplmt": "10000",
         "lmt": "1000000",
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -371,7 +371,7 @@ def stock_board_industry_hist_min_em(
             "ndays": "1",
             "secid": f"90.{stock_board_code}",
         }
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -413,7 +413,7 @@ def stock_board_industry_hist_min_em(
             "smplmt": "10000",
             "lmt": "1000000",
         }
-        r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

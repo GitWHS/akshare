@@ -10,7 +10,7 @@ from functools import lru_cache
 import pandas as pd
 import requests
 
-from extra_utils import get_proxy
+import extra_utils
 
 def stock_zh_a_spot_em() -> pd.DataFrame:
     """
@@ -956,7 +956,7 @@ def code_id_map_em() -> dict:
         "fs": "m:0 t:6,m:0 t:80",
         "fields": "f12",
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     if not data_json["data"]["diff"]:
         return dict()
@@ -975,7 +975,7 @@ def code_id_map_em() -> dict:
         "fs": "m:0 t:81 s:2048",
         "fields": "f12"
     }
-    r = requests.get(url, params=params, timeout=15, proxies=get_proxy(), verify=False)
+    r = requests.get(url, params=params, timeout=15, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     if not data_json["data"]["diff"]:
         return dict()
@@ -1095,7 +1095,7 @@ def stock_zh_a_hist_min_em(
             "iscr": "0",
             "secid": f"{market_code}.{symbol}",
         }
-        r = requests.get(url, timeout=15, params=params, proxies=get_proxy(), verify=False)
+        r = requests.get(url, timeout=15, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -1138,7 +1138,7 @@ def stock_zh_a_hist_min_em(
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, timeout=15, params=params)
+        r = requests.get(url, timeout=15, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
