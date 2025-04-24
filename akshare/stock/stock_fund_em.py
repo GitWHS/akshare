@@ -137,7 +137,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         "fs": "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2",
         "fields": indicator_map[indicator][1],
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers, proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
