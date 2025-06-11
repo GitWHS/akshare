@@ -4,7 +4,7 @@
 import time
 import requests
 
-host_list = ["192.168.1.8", "192.168.1.11"]
+host_list = ["192.168.1.7", "192.168.1.8"]
 
 
 def get_proxy():
