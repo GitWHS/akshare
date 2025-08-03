@@ -1,10 +1,38 @@
 # !/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+import random
 import time
 import requests
+import socket
+from concurrent.futures import ThreadPoolExecutor
 
 host_list = ["192.168.1.7", "192.168.1.8"]
+target_ports = [52001]
+
+
+def check_port(ip, port):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)  # 设置超时时间为1秒
+            result = s.connect_ex((ip, port))
+            if result == 0:
+                return ip
+    except Exception as e:
+        pass
+    return None
+
+
+def scan_network(start_ip, end_ip, port):
+    active_hosts = []
+    with ThreadPoolExecutor(max_workers=100) as executor:
+        future_to_ip = {executor.submit(check_port, f"192.168.1.{i}", port): i for i in range(start_ip, end_ip + 1)}
+        for future in future_to_ip:
+            ip = future.result()
+            if ip:
+                active_hosts.append(ip)
+                print(f"Port {port} is open on {ip}")
+    return active_hosts
 
 
 def get_proxy():
@@ -36,24 +64,31 @@ def get_proxy():
                     "http": proxy_url,
                     "https": proxy_url,
                 }
-                print(f"{formatted_time} 取得代理：{proxy_url}")
+                print(f"{formatted_time} host:{host} 取得代理：{proxy_url}")
             else:
-                print(f"{formatted_time} 无法取得代理")
+                print(f"{formatted_time} host:{host} 无法取得代理")
                 proxy_json = None
             return proxy_json
         else:
-            print(f"{formatted_time} 请求接口失败，状态码: {response.status_code}")
+            print(f"{formatted_time} host:{host} 请求接口失败，状态码: {response.status_code}")
     except requests.RequestException as e:
-        print(f"{formatted_time} 请求发生错误: {e}")
-    except Exception:
-        print(f"{formatted_time} 无法解析接口返回的 JSON 数据。")
+        print(f"{formatted_time} host:{host} 请求发生错误: {e}")
+    except Exception as e:
+        print(f"{formatted_time} 无法解析接口返回的 JSON 数据:", e)
     host_bak = host_list.pop(0)
     host_list.append(host_bak)
+
+    for port in target_ports:
+        active_hosts = scan_network(2, 254, port)
+        print(f"Active host:{active_hosts}: {port}")
+        random.shuffle(active_hosts)
+        for active_host in active_hosts:
+            if active_host not in host_list:
+                host_list.insert(0, active_host)
+
     return None
 
 
-
-import random
 def get_headers():
     user_agent_pool = [
         # Firefox
