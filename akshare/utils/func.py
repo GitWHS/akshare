@@ -31,7 +31,12 @@ def fetch_paginated_data(url: str, base_params: Dict, timeout: int = 15):
     # 复制参数以避免修改原始参数
     params = base_params.copy()
     # 获取第一页数据，用于确定分页信息
-    r = requests.get(url, params=params, timeout=timeout, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    for i in range(5):
+        try:
+            r = requests.get(url, params=params, timeout=timeout, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+            break
+        except Exception as e:
+            print(f"{url} get error {e}")
     data_json = r.json()
     # 计算分页信息
     per_page_num = len(data_json["data"]["diff"])

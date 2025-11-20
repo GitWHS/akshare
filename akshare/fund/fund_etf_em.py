@@ -399,7 +399,7 @@ def fund_etf_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "klt": period,
             "fqt": adjust_map[adjust],
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "beg": "0",
             "end": "20500000",
         }

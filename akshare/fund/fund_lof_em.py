@@ -223,7 +223,20 @@ def fund_lof_hist_min_em(
     :return: 每日分时行情
     :rtype: pandas.DataFrame
     """
-    code_id_dict = _fund_lof_code_id_map_em()
+
+    if secid == "":
+        code_id_dict = _fund_lof_code_id_map_em()
+        secid = code_id_dict.get(symbol, "")
+    if secid == "":
+        for secid in [0, 1]:
+            try:
+                # print(secid, symbol)
+                res = fund_lof_hist_min_em(symbol, period, adjust, secid)
+                break
+            except:
+                pass
+        return res
+    # code_id_dict = _fund_lof_code_id_map_em()
     adjust_map = {
         "": "0",
         "qfq": "1",
@@ -237,9 +250,9 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "ndays": "5",
             "iscr": "0",
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
         }
-        r = requests.get(url, timeout=5, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=5, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -278,11 +291,11 @@ def fund_lof_hist_min_em(
             "ut": "7eea3edcaed734bea9cbfc24409ed989",
             "klt": period,
             "fqt": adjust_map[adjust],
-            "secid": f"{code_id_dict[symbol]}.{symbol}",
+            "secid": f"{secid}.{symbol}",
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, timeout=5, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=5, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
