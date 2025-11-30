@@ -23,7 +23,7 @@ def _fund_etf_code_id_map_em() -> dict:
     :return: ETF 代码和市场标识映射
     :rtype: dict
     """
-    url = "https://88.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",

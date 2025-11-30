@@ -24,7 +24,7 @@ def _fund_lof_code_id_map_em() -> dict:
     :return: LOF 代码和市场标识映射
     :rtype: pandas.DataFrame
     """
-    url = "https://2.push2.eastmoney.com/api/qt/clist/get"
+    url = "https://push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
