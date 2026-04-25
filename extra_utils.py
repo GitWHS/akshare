@@ -1,6 +1,6 @@
 # !/usr/bin/python
 # -*- coding: UTF-8 -*-
-
+import datetime
 import random
 import time
 import requests
@@ -35,7 +35,54 @@ def scan_network(start_ip, end_ip, port):
     return active_hosts
 
 
+def get_clash_proxy():
+    """
+    调用clash_get接口获取代理
+    """
+    timestamp = time.time()
+    local_time = time.localtime(timestamp)
+    formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", local_time)
+    try:
+        # 发送请求到指定接口
+        host = host_list[0]
+        clash_port = 52001
+        url = f"http://{host}:{clash_port}/clash_get/"
+        response = requests.get(url, timeout=3)
+        if response.status_code == 200:
+            listeners = response.json()
+            if listeners and len(listeners) > 0:
+                listener = listeners[0]
+                current_port = listener.get("port")
+                if current_port:
+                    proxy_url = f"http://{host}:{current_port}"
+                    return {
+                        "http": proxy_url,
+                        "https": proxy_url,
+                    }
+        return None
+    except requests.RequestException as e:
+        print(f"{formatted_time} host:{host} 请求发生错误: {e}")
+    except Exception as e:
+        print(f"{formatted_time} 无法解析接口返回的 JSON 数据:", e)
+    host_bak = host_list.pop(0)
+    host_list.append(host_bak)
+
+    for port in target_ports:
+        active_hosts = scan_network(2, 254, port)
+        print(f"Active host:{active_hosts}: {port}")
+        random.shuffle(active_hosts)
+        for active_host in active_hosts:
+            if active_host not in host_list:
+                host_list.insert(0, active_host)
+
+
 def get_proxy():
+    now = datetime.datetime.now()
+    is_weekend = now.weekday() in [5, 6]
+    is_off_hours = now.hour >= 16 or now.hour < 9
+    if is_weekend or is_off_hours:
+        return get_clash_proxy()
+
     timestamp = time.time()
     local_time = time.localtime(timestamp)
     formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", local_time)

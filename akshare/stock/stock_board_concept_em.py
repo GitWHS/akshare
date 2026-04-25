@@ -5,7 +5,7 @@ Date: 2025/3/12 17:00
 Desc: 东方财富-沪深板块-概念板块
 https://quote.eastmoney.com/center/boardlist.html#concept_board
 """
-
+import random
 import re
 from functools import lru_cache
 
@@ -25,7 +25,7 @@ def __stock_board_concept_name_em() -> pd.DataFrame:
     :return: 概念板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "https://79.push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -104,7 +104,7 @@ def stock_board_concept_name_em() -> pd.DataFrame:
     :return: 概念板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -181,7 +181,7 @@ def stock_board_concept_spot_em(symbol: str = "可燃冰") -> pd.DataFrame:
     :return: 概念板块-实时行情
     :rtype: pandas.DataFrame
     """
-    url = "https://91.push2.eastmoney.com/api/qt/stock/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/stock/get"
     field_map = {
         "f43": "最新",
         "f44": "最高",
@@ -255,7 +255,7 @@ def stock_board_concept_hist_em(
         stock_board_concept_em_map["板块名称"] == symbol
     ]["板块代码"].values[0]
     adjust_map = {"": "0", "qfq": "1", "hfq": "2"}
-    url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+    url = f"https://{random.randint(1, 99)}.push2his.eastmoney.com/api/qt/stock/kline/get"
     params = {
         "secid": f"90.{stock_board_code}",
         "fields1": "f1,f2,f3,f4,f5,f6",
@@ -362,7 +362,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
         temp_df["日期时间"] = pd.to_datetime(temp_df["日期时间"])
         return temp_df
     else:
-        url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
+        url = f"https://{random.randint(1, 99)}.push2his.eastmoney.com/api/qt/stock/kline/get"
         params = {
             "secid": f"90.{stock_board_code}",
             "fields1": "f1,f2,f3,f4,f5,f6",

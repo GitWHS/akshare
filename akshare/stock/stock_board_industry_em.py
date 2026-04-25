@@ -5,7 +5,7 @@ Date: 2025/3/10 19:30
 Desc: 东方财富-沪深板块-行业板块
 https://quote.eastmoney.com/center/boardlist.html#industry_board
 """
-
+import random
 import re
 from functools import lru_cache
 
@@ -25,7 +25,7 @@ def __stock_board_industry_name_em() -> pd.DataFrame:
     :return: 行业板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "https://17.push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -121,7 +121,7 @@ def stock_board_industry_name_em() -> pd.DataFrame:
     :return: 行业板块-名称
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -217,7 +217,7 @@ def stock_board_industry_spot_em(symbol: str = "小金属") -> pd.DataFrame:
     :return: 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/stock/get"
+    url = f"https://{random.randint(1, 99)}.push2.eastmoney.com/api/qt/stock/get"
     field_map = {
         "f43": "最新",
         "f44": "最高",
@@ -292,7 +292,7 @@ def stock_board_industry_hist_em(
         "月k": "103",
     }
     adjust_map = {"": "0", "qfq": "1", "hfq": "2"}
-    url = "http://7.push2his.eastmoney.com/api/qt/stock/kline/get"
+    url = f"http://{random.randint(1, 99)}.push2his.eastmoney.com/api/qt/stock/kline/get"
     params = {
         "secid": f"90.{em_code}",
         "fields1": "f1,f2,f3,f4,f5,f6",
@@ -401,7 +401,7 @@ def stock_board_industry_hist_min_em(
         temp_df["日期时间"] = pd.to_datetime(temp_df["日期时间"])
         return temp_df
     else:
-        url = "http://7.push2his.eastmoney.com/api/qt/stock/kline/get"
+        url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
         params = {
             "secid": f"90.{stock_board_code}",
             "fields1": "f1,f2,f3,f4,f5,f6",

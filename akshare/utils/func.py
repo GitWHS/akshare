@@ -56,9 +56,12 @@ def fetch_paginated_data(url: str, base_params: Dict, timeout: int = 15):
                 break
             except Exception as e:
                 print(f"{url} get error {e}")
-        data_json = r.json()
-        inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
-        temp_list.append(inner_temp_df)
+        try:
+            data_json = r.json()
+            inner_temp_df = pd.DataFrame(data_json["data"]["diff"])
+            temp_list.append(inner_temp_df)
+        except Exception as e:
+            print(f"{url} get error {e}")
     # 合并所有数据
     temp_df = pd.concat(temp_list, ignore_index=True)
     temp_df["f3"] = pd.to_numeric(temp_df["f3"], errors="coerce")
