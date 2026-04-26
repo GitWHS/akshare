@@ -8,6 +8,7 @@ https://data.eastmoney.com/zjlx/detail.html
 
 import math
 import time
+import random
 from functools import lru_cache
 
 import pandas as pd
@@ -43,7 +44,7 @@ def stock_individual_fund_flow(
         "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     json_data = r.json()
     content_list = json_data["data"]["klines"]
     temp_df = pd.DataFrame([item.split(",") for item in content_list])
@@ -124,7 +125,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
             "f12,f14,f2,f160,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f260,f261,f124",
         ],
     }
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "fid": indicator_map[indicator][0],
         "po": "1",
@@ -137,7 +138,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         "fs": "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2",
         "fields": indicator_map[indicator][1],
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -150,7 +151,7 @@ def stock_individual_fund_flow_rank(indicator: str = "5日") -> pd.DataFrame:
         )
         for i in range(5):
             try:
-                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
                 break
             except Exception as e:
                 print(f"{url} get error {e}")
@@ -467,7 +468,7 @@ def stock_sector_fund_flow_rank(
             "f12,f14,f2,f160,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f260,f261,f124",
         ],
     }
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -481,7 +482,7 @@ def stock_sector_fund_flow_rank(
         "stat": indicator_map[indicator][1],
         "fields": indicator_map[indicator][2],
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     data_json = r.json()
     total_page = math.ceil(data_json["data"]["total"] / 100)
     temp_list = []
@@ -494,7 +495,7 @@ def stock_sector_fund_flow_rank(
         )
         for i in range(5):
             try:
-                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+                r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
                 break
             except Exception as e:
                 print(f"{url} get error {e}")
@@ -659,7 +660,7 @@ def _get_stock_sector_fund_flow_summary_code() -> dict:
     :return: 行业板块与代码字典
     :rtype: dict
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -694,7 +695,7 @@ def stock_sector_fund_flow_summary(
     :rtype: pandas.DataFrame
     """
     code_name_map = _get_stock_sector_fund_flow_summary_code()
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     if indicator == "今日":
         params = {
             "fid": "f62",
@@ -983,7 +984,7 @@ def stock_sector_fund_flow_hist(code: str = "电源设备") -> pd.DataFrame:
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
         "secid": f"90.{code}",
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -1040,7 +1041,7 @@ def _get_stock_concept_fund_flow_summary_code() -> dict:
     :return: 概念与代码字典
     :rtype: dict
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "5000",
@@ -1052,7 +1053,7 @@ def _get_stock_concept_fund_flow_summary_code() -> dict:
         "ut": "8dec03ba335b81bf4ebdf7b29ec27d15",
         "_": int(time.time() * 1000),
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     data_json = r.json()
     temp_df = pd.DataFrame(data_json["data"]["diff"])
     name_code_map = dict(zip(temp_df["f14"], temp_df["f12"]))
@@ -1076,7 +1077,7 @@ def stock_concept_fund_flow_hist(code: str = "锂电池") -> pd.DataFrame:
         "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
         "secid": f"90.{code}",
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [

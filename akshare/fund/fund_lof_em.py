@@ -8,6 +8,7 @@ https://quote.eastmoney.com/sz166009.html
 """
 
 from functools import lru_cache
+import random
 
 import pandas as pd
 import requests
@@ -24,7 +25,7 @@ def _fund_lof_code_id_map_em() -> dict:
     :return: LOF 代码和市场标识映射
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -50,7 +51,7 @@ def fund_lof_spot_em() -> pd.DataFrame:
     :return: LOF 实时行情
     :rtype: pandas.DataFrame
     """
-    url = "https://push2.eastmoney.com/api/qt/clist/get"
+    url = f"https://{random.randint(1,99)}.push2.eastmoney.com/api/qt/clist/get"
     params = {
         "pn": "1",
         "pz": "100",
@@ -168,7 +169,7 @@ def fund_lof_hist_em(
         "beg": start_date,
         "end": end_date,
     }
-    r = requests.get(url, timeout=5, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, timeout=300, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -252,7 +253,7 @@ def fund_lof_hist_min_em(
             "iscr": "0",
             "secid": f"{secid}.{symbol}",
         }
-        r = requests.get(url, params=params, timeout=5, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -295,7 +296,7 @@ def fund_lof_hist_min_em(
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, params=params, timeout=5, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]
