@@ -1095,7 +1095,7 @@ def stock_zh_a_hist_min_em(
             "iscr": "0",
             "secid": f"{market_code}.{symbol}",
         }
-        r = requests.get(url, timeout=300, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, timeout=30, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -1138,7 +1138,7 @@ def stock_zh_a_hist_min_em(
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, timeout=300, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, timeout=30, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

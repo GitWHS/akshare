@@ -33,7 +33,7 @@ def stock_news_em(keyword: str = "300059") -> pd.DataFrame:
         '"pageSize":100,"preTag":"<em>","postTag":"</em>"}}}',
         "_": "1668256937996",
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=30)
     data_text = r.text
     data_json = json.loads(
         data_text.strip("jQuery3510875346244069884_1668256937995(")[:-1]
@@ -138,7 +138,7 @@ def stock_news_list_info(code, code_type) -> pd.DataFrame:
             #     "http": "http://192.168.1.3:55930",
             #     "https": "http://192.168.1.3:55930",
             # }
-            r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
+            r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=30)
             data_text = r.text
             data_json = json.loads(
                 data_text.strip(callback+"(")[:-1]

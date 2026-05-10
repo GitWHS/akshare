@@ -207,7 +207,7 @@ def stock_board_concept_spot_em(symbol: str = "可燃冰") -> pd.DataFrame:
         fltt="1",
         secid=f"90.{em_code}",
     )
-    r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_dict = r.json()
     result = pd.DataFrame.from_dict(data_dict["data"], orient="index")
     result.rename(field_map, inplace=True)
@@ -267,7 +267,7 @@ def stock_board_concept_hist_em(
         "smplmt": "10000",
         "lmt": "1000000",
     }
-    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=300)
+    r = requests.get(url, params=params, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False, timeout=30)
     data_json = r.json()
     temp_df = pd.DataFrame([item.split(",") for item in data_json["data"]["klines"]])
     temp_df.columns = [
@@ -333,7 +333,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "ndays": '1',
             "secid": f"90.{stock_board_code}",
         }
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -372,7 +372,7 @@ def stock_board_concept_hist_min_em(stock_board_code: str, period: str = "5"
             "end": "20500101",
             "lmt": "1000000",
         }
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

@@ -258,17 +258,17 @@ def fund_etf_hist_em(
     try:
         market_id = code_id_dict[symbol]
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
     except KeyError:
         market_id = 1
         params.update({"secid": f"{market_id}.{symbol}"})
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         if not data_json["data"]:
             market_id = 0
             params.update({"secid": f"{market_id}.{symbol}"})
-            r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+            r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
             data_json = r.json()
     if not (data_json["data"] and data_json["data"]["klines"]):
         return pd.DataFrame()
@@ -361,7 +361,7 @@ def fund_etf_hist_min_em(
             "iscr": "0",
             "secid": f"{secid}.{symbol}",
         }
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["trends"]]
@@ -404,7 +404,7 @@ def fund_etf_hist_min_em(
             "beg": "0",
             "end": "20500000",
         }
-        r = requests.get(url, params=params, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+        r = requests.get(url, params=params, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
         data_json = r.json()
         temp_df = pd.DataFrame(
             [item.split(",") for item in data_json["data"]["klines"]]

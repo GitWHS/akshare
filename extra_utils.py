@@ -79,7 +79,7 @@ def get_clash_proxy():
 def get_proxy():
     now = datetime.datetime.now()
     is_weekend = now.weekday() in [5, 6]
-    is_off_hours = now.hour >= 16 or now.hour < 9
+    is_off_hours = now.hour >= 15 or now.hour < 9
     if is_weekend or is_off_hours:
         return get_clash_proxy()
 

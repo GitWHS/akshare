@@ -351,7 +351,7 @@ def fund_open_fund_info_em(
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36"
     }
-    r = requests.get(url, timeout=300, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
+    r = requests.get(url, timeout=30, headers=extra_utils.get_headers(), proxies=extra_utils.get_proxy(), verify=False)
     data_text = r.text
 
     # 单位净值走势
